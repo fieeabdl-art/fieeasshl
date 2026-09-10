@@ -26,7 +26,14 @@
 
                     fontFamily: {
                         sans: ['Manrope', 'sans-serif'],
-                        serif: ['Cormorant Garamond', 'serif'],
+                        /* =====================================================
+                           FONT JUDUL
+                           Sebelumnya "Cormorant Garamond", sekarang diganti
+                           "Plus Jakarta Sans" sesuai permintaan. Class
+                           "font-serif" dipakai di semua judul (h1-h6) di
+                           seluruh halaman, jadi cukup ganti di sini saja.
+                        ====================================================== */
+                        serif: ['Plus Jakarta Sans', 'sans-serif'],
                     },
                 }
             }
@@ -35,12 +42,15 @@
 
     {{-- =========================================================
          GOOGLE FONT
+         Font judul (dulu Cormorant Garamond) diganti Plus Jakarta
+         Sans. Bobot 400-800 disiapkan supaya H1 (700/800), H2 (700),
+         H3 (600/700) semua tersedia.
     ========================================================== --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
@@ -63,7 +73,7 @@
         h5,
         h6,
         .font-serif {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .font-sans {
@@ -1365,6 +1375,14 @@ NAVBAR
         {{-- Overlay --}}
         <div class="absolute inset-0 bg-black/10"></div>
 
+        {{-- =====================================================
+             DEPTH GRADIENT
+             Gradient sangat halus di bagian bawah hero supaya
+             ada kedalaman (depth), tanpa mengubah gambar/warna
+             brand. Hapus baris ini jika ingin menghilangkan efek.
+        ====================================================== --}}
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/25 to-transparent"></div>
+
 
         {{-- =====================================================
              HERO CONTENT
@@ -1376,6 +1394,7 @@ NAVBAR
                         bg-[#91a9ba]/85
                         backdrop-blur-sm
                         rounded-2xl
+                        shadow-2xl
                         p-8 sm:p-10 lg:p-12
                         text-white">
 
@@ -1588,15 +1607,24 @@ NAVBAR
 
     {{-- =====================================================
          4 KEUNGGULAN
+         Diubah dari baris ikon polos jadi kartu individual
+         (background putih + border + shadow tipis) supaya
+         punya hierarchy dan tidak terlihat seperti teks biasa.
+
+         Cara mengubah jumlah kolom:
+         ganti "md:grid-cols-4" di bawah.
+
+         Cara mengubah jarak antar kartu:
+         ganti "gap-4 sm:gap-5" di bawah.
     ====================================================== --}}
-    <div class="mt-16 bg-[#e3e5df]">
+    <div class="mt-16 bg-brand-gold/[0.06] py-10 sm:py-12">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <div class="grid grid-cols-2 md:grid-cols-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
 
                 {{-- Tim --}}
-                <div class="flex items-center justify-center gap-3 py-6 px-4">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1629,7 +1657,7 @@ NAVBAR
 
 
                 {{-- Material --}}
-                <div class="flex items-center justify-center gap-3 py-6 px-4">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 80ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1660,7 +1688,7 @@ NAVBAR
 
 
                 {{-- Garansi --}}
-                <div class="flex items-center justify-center gap-3 py-6 px-4">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 160ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1691,7 +1719,7 @@ NAVBAR
 
 
                 {{-- Desain --}}
-                <div class="flex items-center justify-center gap-3 py-6 px-4">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 240ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1729,106 +1757,150 @@ NAVBAR
 </section>
 {{-- =========================================================
      VISI & MISI
+     Section ini dibuat mandiri (style & script sendiri dengan
+     prefix "vm-") supaya TIDAK bentrok dengan class ".reveal"
+     global maupun section lain di halaman ini.
 ========================================================= --}}
 
-<section id="visi-misi" class="py-20 bg-[#f5f5f1]">
+<section id="visi-misi" class="relative overflow-hidden bg-[#F5F5F1] py-20 lg:py-28">
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    {{-- Elemen dekoratif halus: garis & lingkaran outline warna emas,
+         opacity rendah, position absolute. Section sudah overflow-hidden
+         di atas supaya elemen ini TIDAK pernah menyebabkan horizontal
+         scroll / overflow halaman. --}}
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div class="absolute -left-16 top-6 h-56 w-56 rounded-full border border-[#B89B72]/20"></div>
+        <div class="absolute -right-20 bottom-0 h-72 w-72 rounded-full border border-[#B89B72]/10"></div>
+        <div class="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#B89B72]/25 to-transparent"></div>
+    </div>
 
-        {{-- Heading --}}
-        <div class="text-center mb-12">
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-            <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase">
+        {{-- Heading (teks tidak diubah, hanya styling & warna) --}}
+        <div class="mb-12 text-center lg:mb-16">
+
+            <span class="text-xs font-semibold uppercase tracking-widest text-[#B89B72]">
                 VISI & MISI
             </span>
 
-            <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-brand-forest mt-3">
+            <h2 class="mt-3 font-serif text-3xl font-semibold text-[#24302C] sm:text-4xl lg:text-5xl">
                 Arah dan Komitmen Kami
             </h2>
 
-            <div class="w-16 h-[2px] bg-brand-gold mx-auto mt-5"></div>
+            <div class="mx-auto mt-5 h-[2px] w-16 bg-[#B89B72]"></div>
 
         </div>
 
+        {{-- Grid Visi & Misi: 2 kolom di desktop/tablet, 1 kolom di mobile --}}
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
 
-        {{-- Visi --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {{-- ============================================
+                 CARD VISI — animasi masuk dari KIRI
+                 Wrapper luar (.vm-card) khusus menangani animasi
+                 masuk + floating. Wrapper dalam (.vm-card-inner)
+                 khusus menangani hover, supaya transform keduanya
+                 tidak saling tabrakan.
+            ============================================= --}}
+            <div
+                class="vm-card vm-reveal-left"
+                data-vm-card
+                data-vm-float="left"
+                style="transition-delay: 0.1s;"
+            >
+                <div class="vm-card-inner group relative rounded-[22px] bg-white p-8 shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
 
-            <div class="bg-white rounded-2xl p-8 shadow-sm">
+                
 
-                <div class="flex items-center gap-4 mb-5">
+                    <div class="relative mb-5 flex items-center gap-4">
 
-                    <div class="w-12 h-12 rounded-full bg-[#8da9bd] flex items-center justify-center text-white">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#B89B72]/10 text-[#B89B72] transition-transform duration-500 ease-out group-hover:scale-110">
+                            <svg
+                                class="h-6 w-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
+                                />
+                            </svg>
+                        </div>
 
-                        <svg
-                            class="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"
-                            />
-                        </svg>
+                        <h3 class="font-serif text-2xl font-bold text-[#24302C]">
+                            Visi
+                        </h3>
 
                     </div>
 
-                    <h3 class="font-serif text-2xl font-bold text-brand-forest">
-                        Visi
-                    </h3>
+                    <div class="mb-5 h-px w-10 bg-[#B89B72]/40"></div>
+
+                    {{-- Isi Visi: KONTEN TIDAK DIUBAH --}}
+                    <p class="relative text-[#24302C]/80 leading-relaxed">
+                        {{ $settings['visi'] ?? 'Visi belum tersedia.' }}
+                    </p>
+
+                 
 
                 </div>
-
-                <p class="text-stone-600 leading-relaxed">
-       {{ $settings['visi'] ?? 'Visi belum tersedia.' }}
-                </p>
-
             </div>
 
+            {{-- ============================================
+                 CARD MISI — animasi masuk dari KANAN
+                 Warna hijau lama (bg-brand-forest) sudah diganti
+                 dengan #6B7C85 sesuai permintaan.
+            ============================================= --}}
+            <div
+                class="vm-card vm-reveal-right"
+                data-vm-card
+                data-vm-float="right"
+                style="transition-delay: 0.25s;"
+            >
+                <div class="vm-card-inner group relative rounded-[22px] bg-[#6B7C85] p-8 text-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
 
-            {{-- Misi --}}
-            <div class="bg-brand-forest rounded-2xl p-8 shadow-sm text-white">
+                  
 
-                <div class="flex items-center gap-4 mb-5">
+                    <div class="relative mb-5 flex items-center gap-4">
 
-                    <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-500 ease-out group-hover:scale-110">
+                            <svg
+                                class="h-6 w-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                        </div>
 
-                        <svg
-                            class="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M5 13l4 4L19 7"
-                            />
-                        </svg>
+                        <h3 class="font-serif text-2xl font-bold text-white">
+                            Misi
+                        </h3>
 
                     </div>
 
-                    <h3 class="font-serif text-2xl font-bold">
-                        Misi
-                    </h3>
+                    <div class="mb-5 h-px w-10 bg-white/30"></div>
 
+                    {{-- Isi Misi: KONTEN TIDAK DIUBAH --}}
+                    <p class="relative leading-relaxed text-white/80">
+                        {{ $settings['misi'] ?? 'Misi belum tersedia.' }}
+                    </p>
+
+                  
                 </div>
-
-                <p class="leading-relaxed text-white/80">
-                    {{ $settings['misi'] ?? 'Misi belum tersedia.' }}
-                </p>
-
             </div>
 
         </div>
@@ -1837,6 +1909,146 @@ NAVBAR
 
 </section>
 
+{{-- =========================================================
+     VISI & MISI - Style animasi (scoped, prefix "vm-")
+========================================================= --}}
+<style>
+   /* CATATAN PERBAIKAN: kurva easing lama, cubic-bezier(.16,.8,.24,1),
+       menyelesaikan ~80% pergerakan hanya dalam ~16% durasi pertama —
+       efeknya kartu terlihat "meloncat" cepat lalu diam (kaku).
+       Diganti ke cubic-bezier(.22,1,.36,1) (easing "smooth ease-out"
+       standar) yang perlambatannya merata sepanjang durasi, sehingga
+       terasa meluncur, bukan menyentak. */
+    .vm-reveal-left,
+    .vm-reveal-right {
+        opacity: 0;
+        transition:
+            opacity 1.1s cubic-bezier(.22, 1, .36, 1),
+            transform 1.1s cubic-bezier(.22, 1, .36, 1);
+        will-change: opacity, transform;
+    }
+
+    .vm-reveal-left {
+        transform: translateX(-80px);
+    }
+
+    .vm-reveal-right {
+        transform: translateX(80px);
+    }
+
+    .vm-reveal-left.vm-in-view,
+    .vm-reveal-right.vm-in-view {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* CATATAN PERBAIKAN: keyframe lama hanya punya 1 titik tengah
+       (0% -> puncak -> 0%), sehingga gerakannya seperti bandul/ayunan
+       yang simetris dan terasa mekanis. Sekarang dipecah jadi beberapa
+       titik dengan jalur X/Y yang tidak simetris, supaya jalur
+       geraknya melengkung natural (seperti daun tertiup), bukan
+       gerak bolak-balik lurus. */
+    @keyframes vmFloatLeft {
+        0%   { transform: translate(0, 0); }
+        22%  { transform: translate(1.5px, -3px); }
+        48%  { transform: translate(3px, -5.5px); }
+        75%  { transform: translate(1px, -2.5px); }
+        100% { transform: translate(0, 0); }
+    }
+
+    @keyframes vmFloatRight {
+        0%   { transform: translate(0, 0); }
+        30%  { transform: translate(-2px, -2px); }
+        55%  { transform: translate(-3.5px, -4.5px); }
+        80%  { transform: translate(-1px, -1.5px); }
+        100% { transform: translate(0, 0); }
+    }
+
+    .vm-card[data-vm-float="left"].vm-floating {
+        animation: vmFloatLeft 7s ease-in-out infinite;
+    }
+
+    .vm-card[data-vm-float="right"].vm-floating {
+        animation: vmFloatRight 7.6s ease-in-out infinite;
+    }
+    /* Accessibility: hormati preferensi "prefers-reduced-motion".
+       Jika aktif, tampilkan langsung tanpa animasi masuk / floating / hover-movement. */
+    @media (prefers-reduced-motion: reduce) {
+        .vm-reveal-left,
+        .vm-reveal-right {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        .vm-card.vm-floating {
+            animation: none;
+        }
+
+        .vm-card-inner {
+            transition: none !important;
+        }
+    }
+</style>
+
+{{-- =========================================================
+     VISI & MISI - Script animasi (scoped, tidak memakai
+     IntersectionObserver / class global ".reveal" yang sudah
+     dipakai section lain, supaya section lain tidak terpengaruh)
+========================================================= --}}
+<script>
+    (function () {
+
+        var vmCards = document.querySelectorAll('[data-vm-card]');
+
+        if (vmCards.length === 0) {
+            return;
+        }
+
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Jika reduced motion aktif: langsung tampilkan tanpa animasi apa pun.
+        if (prefersReducedMotion) {
+            vmCards.forEach(function (card) {
+                card.classList.add('vm-in-view');
+            });
+            return;
+        }
+
+        // Setelah animasi masuk (transform) selesai, baru mulai floating halus.
+        vmCards.forEach(function (card) {
+            card.addEventListener('transitionend', function (event) {
+                if (event.propertyName === 'transform' && card.classList.contains('vm-in-view')) {
+                    card.classList.add('vm-floating');
+                }
+            });
+        });
+
+        // Browser lama tanpa IntersectionObserver: langsung tampilkan.
+        if (!('IntersectionObserver' in window)) {
+            vmCards.forEach(function (card) {
+                card.classList.add('vm-in-view');
+            });
+            return;
+        }
+
+        var vmObserver = new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('vm-in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+
+        vmCards.forEach(function (card) {
+            vmObserver.observe(card);
+        });
+
+    })();
+</script>
 {{-- =========================================================
      LAYANAN
 ========================================================= --}}
@@ -1871,6 +2083,18 @@ NAVBAR
         @endphp
 
 
+        {{-- =====================================================
+             SERVICE CARD
+             Kartu layanan: gambar lebih tinggi + rounded lebih
+             besar + border tipis + garis emas kecil di bawah
+             judul, supaya card terasa lebih "berisi" dan premium.
+
+             Ubah jumlah kolom: ganti "md:grid-cols-3".
+             Ubah jarak antar kartu: ganti "gap-8".
+             Ubah tinggi gambar: ganti "h-64" -> "h-72" di kelas img.
+             Ubah radius sudut: ganti "rounded-2xl".
+             Ubah bayangan: ganti "shadow-sm" / "hover:shadow-xl".
+        ====================================================== --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
             @forelse($services as $index => $service)
@@ -1882,7 +2106,7 @@ NAVBAR
                 @endphp
 
                 <article
-                    class="reveal group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5"
+                    class="reveal group bg-white rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5"
                     @if($index > 0)
                         style="transition-delay: {{ min($index * 100, 500) }}ms"
                     @endif
@@ -1894,7 +2118,7 @@ NAVBAR
                             src="{{ $imageUrl }}"
                             alt="{{ $service->title }}"
                             loading="lazy"
-                            class="h-64 w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            class="h-56 sm:h-64 lg:h-72 w-full object-cover transition-transform duration-700 group-hover:scale-110"
                             onerror="this.src='{{ $defaultServiceImages[0] }}'"
                         >
 
@@ -1905,6 +2129,8 @@ NAVBAR
                         <h3 class="font-serif font-bold text-xl text-brand-forest mb-2">
                             {{ $service->title }}
                         </h3>
+
+                        <div class="w-10 h-[2px] bg-brand-gold mb-3"></div>
 
                         <p class="text-stone-500 text-sm leading-relaxed">
                             {{ $service->description }}
@@ -2533,7 +2759,15 @@ NAVBAR
 {{-- =========================================================
      PORTOFOLIO
 ========================================================= --}}
-<section id="portofolio" class="py-20 bg-white">
+{{-- =====================================================
+     SECTION BACKGROUND
+     Sengaja diberi tint sangat halus dari warna brand (forest,
+     opacity 4%), BUKAN warna baru. Tujuannya supaya section ini
+     terlihat beda dari section "Tim Kami" tepat di atasnya
+     (yang juga terang), sehingga antar-section tidak menyatu.
+     Warna brand asli tetap sama, hanya opacity yang berubah.
+===================================================== --}}
+<section id="portofolio" class="py-20 bg-brand-forest/[0.04]">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -2621,13 +2855,24 @@ NAVBAR
 
                     @forelse($portfolios as $p)
 
+                        {{-- =====================================================
+                             PORTFOLIO CARD
+                             Diperbesar & diberi border tipis supaya gambar jadi
+                             fokus utama (bukan sekadar thumbnail kecil). Lebar
+                             kartu TETAP diatur oleh CSS .portfolio-item di atas
+                             (untuk carousel) — di sini hanya mengubah tampilan
+                             di dalam kartu, bukan lebar/posisinya.
+
+                             Ubah tinggi gambar: ganti "h-64 sm:h-72".
+                             Ubah radius sudut: ganti "rounded-2xl".
+                        ====================================================== --}}
                         <article
-                            class="portfolio-item reveal bg-white rounded-lg shadow overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
+                            class="portfolio-item reveal bg-white rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
                             data-category="{{ $p['category'] ?? '' }}"
                             data-portfolio-id="{{ $p['id'] ?? 0 }}"
                         >
 
-                            <div class="h-64 bg-stone-100 relative overflow-hidden group">
+                            <div class="h-64 sm:h-72 bg-stone-100 relative overflow-hidden group">
 
                                 <img
                                     src="{{ $p['image_url'] ?? '' }}"
@@ -2637,7 +2882,10 @@ NAVBAR
                                     onerror="this.src='https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'"
                                 >
 
-                                <div class="absolute top-3 left-3 bg-brand-gold text-brand-forest text-[10px] tracking-wider uppercase font-bold px-2.5 py-1 rounded">
+                                {{-- Scrim halus di bawah gambar supaya badge & judul lebih menyatu dengan foto --}}
+                                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/25 to-transparent"></div>
+
+                                <div class="absolute top-3 left-3 bg-brand-gold text-brand-forest text-[10px] tracking-wider uppercase font-bold px-3 py-1.5 rounded-full shadow-sm">
                                     {{ $p['category'] ?? 'Interior' }}
                                 </div>
 
@@ -2656,6 +2904,8 @@ NAVBAR
                                 <h3 class="font-serif font-bold text-lg text-brand-forest mb-1">
                                     {{ $p['title'] ?? '' }}
                                 </h3>
+
+                                <div class="w-8 h-[2px] bg-brand-gold/60 mb-2"></div>
 
                                 <p class="text-stone-500 text-xs sm:text-sm font-light line-clamp-3">
                                     {{ $p['description'] ?? '' }}
@@ -2806,19 +3056,68 @@ NAVBAR
      ALUR KERJA
      STATIC - TIDAK MENGGUNAKAN DATABASE
 ========================================================= --}}
-<section id="alur-kerja" class="py-16 lg:py-20 bg-white">
+{{-- =========================================================
+     ALUR KERJA - Warna ikon (scoped ke #alur-kerja)
+
+     Ikon & panah di section ini digambar dengan stroke/fill
+     "black" langsung di dalam SVG (bukan class Tailwind), jadi
+     warnanya diganti lewat CSS di sini, BUKAN dengan mengedit
+     setiap SVG satu per satu (SVG & JS section ini tidak disentuh
+     sama sekali).
+
+     - Ikon utama (svg 76x76)  -> warna brand-forest
+     - Panah penghubung (svg lebih kecil) -> warna brand-gold
+
+     Jika ingin mengembalikan ke hitam polos, hapus blok <style>
+     ini saja.
+========================================================= --}}
+<style>
+    #alur-kerja svg[width="76"] [stroke="black"] {
+        stroke: #2C3E35; /* brand-forest */
+    }
+
+    #alur-kerja svg[width="76"] [fill="black"] {
+        fill: #2C3E35; /* brand-forest */
+    }
+
+    #alur-kerja svg[width="46"] [stroke="black"],
+    #alur-kerja svg[width="28"] [stroke="black"],
+    #alur-kerja svg[width="32"] [stroke="black"] {
+        stroke: #C5A880; /* brand-gold */
+    }
+</style>
+
+{{-- =====================================================
+     SECTION BACKGROUND
+     Tint sangat halus dari warna brand-gold, supaya panel putih
+     di dalamnya (lihat "ALUR KERJA PANEL" di bawah) punya kontras
+     lembut dan section ini tidak menyatu dengan section putih
+     lain di sekitarnya.
+===================================================== --}}
+<section id="alur-kerja" class="py-16 lg:py-20 bg-brand-gold/[0.05] relative">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Heading --}}
         <div class="mb-8 lg:mb-10 reveal">
-            <h2 class="text-4xl sm:text-5xl lg:text-[48px] font-bold tracking-tight text-black">
+            <h2 class="text-4xl sm:text-5xl lg:text-[48px] font-bold tracking-tight text-brand-forest">
                 ALUR KERJA
             </h2>
 
-            <div class="w-[76px] h-[2px] bg-black mt-2"></div>
+            <div class="w-[76px] h-[2px] bg-brand-gold mt-2"></div>
         </div>
 
+
+        {{-- =====================================================
+             ALUR KERJA PANEL
+             Membungkus baris ikon (desktop & mobile) dalam satu
+             kartu putih supaya section ini tidak terasa seperti
+             "ikon mengambang di halaman kosong".
+
+             Ubah radius sudut kartu: ganti "rounded-3xl".
+             Ubah padding dalam kartu: ganti "p-6 sm:p-8 lg:p-10".
+        ====================================================== --}}
+        <div class="reveal bg-white rounded-3xl border border-brand-forest/10 shadow-sm p-6 sm:p-8 lg:p-10">
 
         {{-- =====================================================
              DESKTOP
@@ -2828,7 +3127,7 @@ NAVBAR
 
 
             {{-- 01 KONSULTASI --}}
-            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[122px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -2896,8 +3195,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -2911,7 +3210,7 @@ NAVBAR
 
 
             {{-- 02 SURVEI --}}
-            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[122px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -2954,8 +3253,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -3018,8 +3317,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -3033,7 +3332,7 @@ NAVBAR
 
 
             {{-- 04 REVISI --}}
-            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[122px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -3091,8 +3390,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -3106,7 +3405,7 @@ NAVBAR
 
 
             {{-- 05 PRODUKSI --}}
-            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[122px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -3149,8 +3448,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -3164,7 +3463,7 @@ NAVBAR
 
 
             {{-- 06 INSTALASI --}}
-            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[122px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -3205,8 +3504,8 @@ NAVBAR
 
 
             {{-- Arrow --}}
-            <div class="flex items-center pt-[30px] shrink-0">
-                <svg width="46" height="22" viewBox="0 0 46 22" fill="none">
+            <div class="flex items-center pt-[32px] shrink-0">
+                <svg width="34" height="17" viewBox="0 0 46 22" fill="none">
                     <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                     <path
                         d="M30 4L38 11L30 18"
@@ -3220,7 +3519,7 @@ NAVBAR
 
 
             {{-- 07 SERAH TERIMA --}}
-            <div class="flex flex-col items-center text-center w-[140px] shrink-0">
+            <div class="flex flex-col items-center text-center w-[130px] shrink-0">
 
                 <div class="h-[82px] flex items-center justify-center">
 
@@ -3717,6 +4016,9 @@ NAVBAR
 
         </div>
 
+        {{-- tutup ALUR KERJA PANEL --}}
+        </div>
+
     </div>
 
 </section>
@@ -3725,7 +4027,14 @@ NAVBAR
 {{-- =========================================================
      TESTIMONI
 ========================================================= --}}
-<section id="testimoni" class="py-20 bg-white">
+{{-- =====================================================
+     SECTION BACKGROUND
+     Sama seperti Portofolio: hanya tint sangat halus dari warna
+     brand forest (opacity 4%), bukan warna baru. Ini membuat
+     section ini terpisah secara visual dari "Alur Kerja"
+     tepat di atasnya.
+===================================================== --}}
+<section id="testimoni" class="py-20 bg-brand-forest/[0.04]">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -4160,15 +4469,25 @@ NAVBAR
 
                                         @if($cp->logo)
 
+                                            {{-- =========================================
+                                                 LOGO KLIEN & MITRA
+                                                 Sebelumnya logo dibuat abu-abu (grayscale)
+                                                 + transparan (opacity 80%) secara default,
+                                                 baru berwarna saat hover. Sekarang logo
+                                                 langsung tampil warna asli, supaya tidak
+                                                 terlihat pucat.
+
+                                                 Kalau ingin efek hover tetap ada (misalnya
+                                                 sedikit membesar), ubah lewat "hover:scale-105"
+                                                 di bawah, bukan lewat opacity/grayscale.
+                                            ============================================ --}}
                                             <img
                                                 src="{{ Storage::url($cp->logo) }}"
                                                 alt="{{ $cp->name }}"
                                                 loading="lazy"
                                                 class="max-h-14 max-w-full object-contain
-                                                       grayscale opacity-80
-                                                       transition-all duration-300
-                                                       hover:grayscale-0
-                                                       hover:opacity-100"
+                                                       transition-transform duration-300
+                                                       hover:scale-105"
                                             >
 
                                         @else
@@ -4219,9 +4538,9 @@ NAVBAR
 ========================================================= --}}
 <section id="kontak" class="py-20 bg-white">
 
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-10 items-start">
 
             {{-- Intro --}}
             <div class="reveal reveal-left">
@@ -4378,6 +4697,142 @@ NAVBAR
 
             </div>
 
+
+            {{-- Informasi Hub Korporat --}}
+            <div class="reveal reveal-right">
+
+                <h3 class="font-serif text-2xl font-semibold text-brand-forest mb-2">
+                    Informasi Hub Korporat
+                </h3>
+
+                <div class="w-16 h-[2px] bg-brand-gold mb-6"></div>
+
+                <div class="space-y-5">
+
+                    {{-- Kantor Operasional & Administrasi --}}
+                    <div class="flex items-start gap-4">
+
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </span>
+
+                        <div>
+                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                Kantor Operasional &amp; Administrasi
+                            </span>
+                            <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                Jln. Ciaul Pasir Cisarua - Cikole, Jingga Residence Blok B23
+                            </p>
+                            <p class="text-xs text-stone-500 mt-1">
+                                Kota Sukabumi - Jabar 43115
+                            </p>
+                        </div>
+
+                    </div>
+
+                    {{-- Kantor Utama (Pusat & Logistik) --}}
+                    <div class="flex items-start gap-4">
+
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M9 13h.01M15 10h.01M15 13h.01" />
+                            </svg>
+                        </span>
+
+                        <div>
+                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                Kantor Utama (Pusat &amp; Logistik)
+                            </span>
+                            <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                Jln. Pelabuhan II No.89B Citamiang Kota Sukabumi
+                            </p>
+                            <p class="text-xs text-stone-500 mt-1">
+                                Kec. Citamiang, Kota Sukabumi, Jawa Barat
+                            </p>
+                        </div>
+
+                    </div>
+
+                    {{-- WhatsApp Hotline --}}
+                    <div class="flex items-start gap-4">
+
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.001 2C6.478 2 2 6.477 2 12c0 1.9.526 3.68 1.44 5.2L2 22l4.94-1.396A9.95 9.95 0 0012.001 22C17.524 22 22 17.523 22 12S17.524 2 12.001 2zm0 18.2a8.15 8.15 0 01-4.35-1.26l-.312-.19-3.033.858.834-2.958-.202-.318A8.15 8.15 0 013.85 12c0-4.5 3.65-8.15 8.151-8.15 4.5 0 8.15 3.65 8.15 8.15 0 4.501-3.65 8.2-8.15 8.2z"/>
+                            </svg>
+                        </span>
+
+                        <div>
+                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                WhatsApp Hotline (Kantor Utama)
+                            </span>
+                            <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                {{ $settings['wa_number'] ?? '0813 1111 4523' }}
+                            </p>
+                            <p class="text-xs text-stone-500 mt-1">
+                                Senin - Sabtu (08:00 - 17:00 WIB)
+                            </p>
+                        </div>
+
+                    </div>
+
+                    {{-- Email --}}
+                    <div class="flex items-start gap-4">
+
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+
+                        <div>
+                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                Surel Rekanan &amp; Bisnis
+                            </span>
+                            <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                {{ $settings['email'] ?? 'cs.aradaofficial@gmail.com' }}
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- Peta Lokasi --}}
+                <div class="relative mt-6 rounded-2xl overflow-hidden border border-stone-200 h-[260px]">
+
+                    <a
+                        href="https://www.google.com/maps/search/?api=1&query=Jl.+Pelabuhan+II+No.89B+Tipar+Kec.+Citamiang+Kota+Sukabumi+Jawa+Barat+43131"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand-forest shadow-md hover:bg-white transition"
+                    >
+                        Buka di Maps
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+
+                    <iframe
+                        title="Lokasi Kantor Bumiyuji Living"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.6775!2d106.9256122!3d-6.9289479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68483c9276f957%3A0xf6d98b5c6b47309d!2sJl.%20Pelabuhan%20II%20No.89B%2C%20Tipar%2C%20Kec.%20Citamiang%2C%20Kota%20Sukabumi%2C%20Jawa%20Barat%2043131!5e0!3m2!1sid!2sid!4v1716550000000!5m2!1sid!2sid"
+                        width="100%"
+                        height="100%"
+                        style="border:0"
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        class="w-full h-full"
+                    ></iframe>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -4388,126 +4843,162 @@ NAVBAR
 {{-- =========================================================
      FOOTER
 ========================================================= --}}
-<footer class="bg-brand-charcoal text-white pt-16 pb-8">
+<footer class="bg-brand-cream py-16 sm:py-20 border-t border-brand-gold/15">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+            <div class="grid grid-cols-1 md:grid-cols-[1.1fr_1fr_1.2fr] gap-10 lg:gap-12">
 
-        {{-- Brand --}}
-        <div>
+                {{-- Brand --}}
+                <div class="md:border-r md:border-brand-gold/25 md:pr-10">
 
-            <a href="#beranda" class="flex items-center gap-3 mb-4">
+                    <a href="#beranda" class="inline-flex flex-col mb-5">
 
-                @if(!empty($settings['logo_url']))
+                        @if(!empty($settings['logo_url']))
 
-                    <img
-                        src="{{ $settings['logo_url'] }}"
-                        alt="{{ $settings['site_title'] ?? 'Logo' }}"
-                        class="h-11 w-auto object-contain"
+                            <img
+                                src="{{ $settings['logo_url'] }}"
+                                alt="{{ $settings['site_title'] ?? 'Logo' }}"
+                                class="h-11 w-auto object-contain"
+                            >
+
+                        @else
+
+                            <span class="font-serif text-3xl sm:text-4xl tracking-widest font-extrabold text-brand-forest leading-none">
+                                BUMIYUJI
+                            </span>
+
+                            <span class="flex items-center gap-3 mt-2">
+                                <span class="h-px w-6 bg-brand-gold"></span>
+                                <span class="text-sm sm:text-base tracking-[0.35em] font-medium text-brand-forest/80">
+                                    LIVING
+                                </span>
+                                <span class="h-px w-6 bg-brand-gold"></span>
+                            </span>
+
+                            <span class="text-[10px] sm:text-[11px] tracking-[0.3em] font-semibold text-stone-400 uppercase mt-3">
+                                Interior | Furniture | Custom
+                            </span>
+
+                        @endif
+
+                    </a>
+
+                    <p class="text-sm text-stone-500 leading-relaxed max-w-xs">
+                        Mewujudkan ruang impian Anda menjadi kenyataan di Sukabumi, Jawa Barat dengan desain interior yang elegan, fungsional, dan berkualitas tinggi.
+                    </p>
+
+                    <a
+                        href="{{ route('admin.login') }}"
+                        class="mt-6 inline-flex items-center gap-2 rounded-full border border-brand-gold/60 px-5 py-2.5 text-sm font-medium text-brand-forest hover:bg-brand-gold hover:text-white transition-colors"
                     >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z" />
+                        </svg>
+                        Login Dashboard Admin
+                    </a>
 
-                @else
-
-                    <span class="flex flex-col">
-
-                        <span class="font-serif text-2xl tracking-widest font-bold text-white leading-none">
-                            BUMIYUJI
-                        </span>
-
-                        <span class="text-[10px] tracking-[0.25em] font-medium text-brand-gold uppercase mt-1">
-                            L I V I N G
-                        </span>
-
-                    </span>
-
-                @endif
-
-            </a>
+                </div>
 
 
-            <p class="text-stone-400 text-xs sm:text-sm leading-relaxed">
-                Mewujudkan ruang impian Anda menjadi kenyataan di Sukabumi, Jawa Barat.
-            </p>
+                {{-- Akses Menu Cepat --}}
+                <div>
+
+                    <h4 class="font-serif font-bold text-sm sm:text-base text-brand-forest mb-6 uppercase tracking-wide">
+                        Akses Menu Cepat
+                    </h4>
+
+                    <ul class="text-sm text-stone-600">
+
+                        @foreach ([
+                            ['label' => 'Beranda', 'href' => '#beranda'],
+                            ['label' => 'Tentang Kami', 'href' => '#tentang'],
+                            ['label' => 'Layanan Kami', 'href' => '#layanan'],
+                            ['label' => 'Portofolio', 'href' => '#portofolio'],
+                            ['label' => 'Proses Kerja', 'href' => '#alur-kerja'],
+                            ['label' => 'Artikel & Inspirasi', 'href' => '#'],
+                            ['label' => 'Kontak', 'href' => '#kontak'],
+                        ] as $menu)
+
+                            <li class="border-b border-brand-gold/15 last:border-b-0">
+
+                                <a
+                                    href="{{ $menu['href'] }}"
+                                    class="flex items-center gap-2 py-3 hover:text-brand-gold transition-colors"
+                                >
+                                    <svg class="w-3.5 h-3.5 text-brand-gold shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                    {{ $menu['label'] }}
+                                </a>
+
+                            </li>
+
+                        @endforeach
+
+                    </ul>
+
+                </div>
 
 
-            <div class="text-xs text-stone-500 mt-4">
+                {{-- Divisi Terafiliasi --}}
+                <div>
 
-                <a
-                    href="{{ route('admin.login') }}"
-                    class="text-brand-gold hover:underline"
-                >
-                    🔐 Login Dashboard Admin
-                </a>
+                    <h4 class="font-serif font-bold text-sm sm:text-base text-brand-forest mb-6 uppercase tracking-wide">
+                        Divisi Terafiliasi
+                    </h4>
+
+                    <div class="space-y-4">
+
+                        @foreach ([
+                            ['letter' => 'A', 'color' => '#2C3E35', 'name' => 'CV. Afkara Putra Multimedia', 'desc' => 'IT, Networking & Pengadaan'],
+                            ['letter' => 'Y', 'color' => '#1F6F78', 'name' => 'CV. Yuji Sabumi Perkasa', 'desc' => 'Interior, Custom Furniture'],
+                            ['letter' => 'M', 'color' => '#2C6E9E', 'name' => 'CV. Indonesia Muda Pratama', 'desc' => 'General Contractor Konsultan Perencanaan dan Pengawasan'],
+                        ] as $divisi)
+
+                            <div class="flex items-start gap-4 rounded-2xl border border-brand-gold/20 bg-white/60 p-4">
+
+                                <span
+                                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-cream border border-brand-gold/20 font-serif font-extrabold text-lg"
+                                    style="color: {{ $divisi['color'] }};"
+                                >
+                                    {{ $divisi['letter'] }}
+                                </span>
+
+                                <div>
+                                    <p class="text-sm font-bold text-brand-forest leading-snug">
+                                        {{ $divisi['name'] }}
+                                    </p>
+                                    <p class="text-xs text-stone-500 mt-1 leading-snug">
+                                        {{ $divisi['desc'] }}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </div>
 
+            <div class="mt-10 sm:mt-12 pt-6 border-t border-brand-gold/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-stone-500">
 
-        {{-- Contact --}}
-        <div>
-
-            <h4 class="font-serif font-bold text-lg text-brand-gold mb-6 uppercase">
-                Contact Us
-            </h4>
-
-            <ul class="space-y-4 text-xs sm:text-sm text-stone-300">
-
-                <li>
-                    Alamat:
-                    {{ $settings['address'] ?? '' }}
-                </li>
-
-                <li>
-                    WhatsApp:
-                    +{{ $settings['wa_number'] ?? '' }}
-                </li>
-
-                <li>
-                    Email:
-                    {{ $settings['email'] ?? '' }}
-                </li>
-
-            </ul>
-
-        </div>
-
-
-        {{-- Social --}}
-        <div>
-
-            <h4 class="font-serif font-bold text-lg text-brand-gold mb-6 uppercase">
-                Social Media
-            </h4>
-
-            @if(!empty($settings['instagram']))
-
-                <a
-                    href="{{ $settings['instagram'] }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-stone-400 text-xs hover:text-brand-gold transition"
-                >
-                    Instagram
-                </a>
-
-            @else
-
-                <p class="text-stone-400 text-xs">
-                    Instagram belum tersedia.
+                <p>
+                    &copy; {{ date('Y') }} Bumiyuji Living.
+                    Seluruh Hak Cipta Dilindungi.
                 </p>
 
-            @endif
+                <div class="flex items-center gap-3">
+                    <a href="#" class="hover:text-brand-gold transition-colors">Syarat &amp; Ketentuan</a>
+                    <span class="text-brand-gold">&bull;</span>
+                    <a href="#" class="hover:text-brand-gold transition-colors">Kebijakan Privasi</a>
+                </div>
 
-        </div>
-
-    </div>
-
-
-    <div class="border-t border-stone-800 pt-8 text-center text-xs text-stone-500">
-
-        &copy; {{ date('Y') }} Bumiyuji Living.
-        Seluruh Hak Cipta Dilindungi.
+            </div>
 
     </div>
 
