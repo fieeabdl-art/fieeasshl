@@ -15,4 +15,9 @@ php artisan view:clear
 
 php artisan storage:link --force || true
 
+# Jalankan migration otomatis tiap container start.
+# Diperlukan karena Render free tier tidak punya akses tab "Shell".
+# Aman dijalankan berulang kali karena Laravel skip migration yang sudah pernah jalan.
+php artisan migrate --force || true
+
 exec apache2-foreground
