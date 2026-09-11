@@ -36,6 +36,10 @@ class UpdateSettingRequest extends FormRequest
             'contact_whatsapp' => ['nullable', 'string', 'max:30'],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'contact_address' => ['nullable', 'string'],
+            'contact_address_note' => ['nullable', 'string', 'max:255'],
+            'secondary_address' => ['nullable', 'string'],
+            'secondary_address_note' => ['nullable', 'string', 'max:255'],
+            'office_hours' => ['nullable', 'string', 'max:255'],
             'contact_maps_url' => ['nullable', 'url', 'max:500'],
 
             'social_instagram' => ['nullable', 'url', 'max:500'],

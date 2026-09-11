@@ -120,15 +120,52 @@
                            class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">
                 </div>
                 <div class="sm:col-span-2">
-                    <label for="contact_address" class="mb-1.5 block text-sm font-medium text-stone-700">Alamat</label>
-                    <textarea name="contact_address" id="contact_address" rows="2"
-                              class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">{{ old('contact_address', $setting->contact_address) }}</textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="contact_maps_url" class="mb-1.5 block text-sm font-medium text-stone-700">Google Maps URL</label>
-                    <input type="url" name="contact_maps_url" id="contact_maps_url" value="{{ old('contact_maps_url', $setting->contact_maps_url) }}" placeholder="https://maps.google.com/..."
+                    <label for="office_hours" class="mb-1.5 block text-sm font-medium text-stone-700">Jam Operasional</label>
+                    <input type="text" name="office_hours" id="office_hours" value="{{ old('office_hours', $setting->office_hours) }}" placeholder="Senin - Sabtu (08:00 - 17:00 WIB)"
                            class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">
+                    <p class="mt-1 text-xs text-stone-400">Ditampilkan di bawah nomor WhatsApp pada halaman Kontak.</p>
                 </div>
+            </div>
+
+            <div class="mt-6 border-t border-stone-100 pt-5">
+                <h3 class="mb-1 text-sm font-semibold text-stone-800">Kantor Utama (Pusat &amp; Logistik)</h3>
+                <p class="mb-3 text-xs text-stone-400">Alamat ini juga dipakai untuk peta lokasi di halaman Kontak.</p>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label for="contact_address" class="mb-1.5 block text-sm font-medium text-stone-700">Alamat</label>
+                        <textarea name="contact_address" id="contact_address" rows="2" placeholder="Jln. Pelabuhan II No.89B Citamiang Kota Sukabumi"
+                                  class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">{{ old('contact_address', $setting->contact_address) }}</textarea>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="contact_address_note" class="mb-1.5 block text-sm font-medium text-stone-700">Keterangan Alamat</label>
+                        <input type="text" name="contact_address_note" id="contact_address_note" value="{{ old('contact_address_note', $setting->contact_address_note) }}" placeholder="Kec. Citamiang, Kota Sukabumi, Jawa Barat"
+                               class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-stone-100 pt-5">
+                <h3 class="mb-1 text-sm font-semibold text-stone-800">Kantor Operasional &amp; Administrasi</h3>
+                <p class="mb-3 text-xs text-stone-400">Kosongkan jika hanya punya satu kantor — bagian ini otomatis disembunyikan di halaman publik.</p>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label for="secondary_address" class="mb-1.5 block text-sm font-medium text-stone-700">Alamat</label>
+                        <textarea name="secondary_address" id="secondary_address" rows="2" placeholder="Jln. Ciaul Pasir Cisarua - Cikole, Jingga Residence Blok B23"
+                                  class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">{{ old('secondary_address', $setting->secondary_address) }}</textarea>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="secondary_address_note" class="mb-1.5 block text-sm font-medium text-stone-700">Keterangan Alamat</label>
+                        <input type="text" name="secondary_address_note" id="secondary_address_note" value="{{ old('secondary_address_note', $setting->secondary_address_note) }}" placeholder="Kota Sukabumi - Jabar 43115"
+                               class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-stone-100 pt-5">
+                <label for="contact_maps_url" class="mb-1.5 block text-sm font-medium text-stone-700">Google Maps URL</label>
+                <input type="url" name="contact_maps_url" id="contact_maps_url" value="{{ old('contact_maps_url', $setting->contact_maps_url) }}" placeholder="https://maps.google.com/..."
+                       class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm shadow-sm focus:border-[#2C3E35] focus:outline-none focus:ring-2 focus:ring-[#2C3E35]/20">
+                <p class="mt-1 text-xs text-stone-400">Dipakai untuk tombol "Buka di Maps". Peta yang tertanam di halaman otomatis dibuat dari alamat Kantor Utama di atas.</p>
             </div>
         </section>
 

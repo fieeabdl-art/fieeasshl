@@ -21,6 +21,10 @@ use Illuminate\Support\Carbon;
  * @property string|null $contact_whatsapp
  * @property string|null $contact_email
  * @property string|null $contact_address
+ * @property string|null $contact_address_note
+ * @property string|null $secondary_address
+ * @property string|null $secondary_address_note
+ * @property string|null $office_hours
  * @property string|null $contact_maps_url
  * @property array<string, string>|null $social_links
  * @property string|null $appointment_whatsapp_number
@@ -42,6 +46,10 @@ use Illuminate\Support\Carbon;
     'contact_whatsapp',
     'contact_email',
     'contact_address',
+    'contact_address_note',
+    'secondary_address',
+    'secondary_address_note',
+    'office_hours',
     'contact_maps_url',
     'social_links',
     'appointment_whatsapp_number',

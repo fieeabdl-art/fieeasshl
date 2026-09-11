@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\ClientPartnerController;
+use App\Http\Controllers\Admin\AffiliatedDivisionController;
 use App\Http\Controllers\Admin\WorkflowController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureTeamMembership;
 use App\Models\ClientPartner;
+use App\Models\AffiliatedDivision;
 use App\Models\Portfolio;
 use App\Models\Service;
 use App\Models\Setting;
@@ -71,7 +73,15 @@ Route::get('/', function () {
 
         'address' => $setting->contact_address,
 
-        'office_hours' => 'Senin - Sabtu: 08:00 - 17:00',
+        'address_note' => $setting->contact_address_note,
+
+        'secondary_address' => $setting->secondary_address,
+
+        'secondary_address_note' => $setting->secondary_address_note,
+
+        'office_hours' => $setting->office_hours ?: 'Senin - Sabtu: 08:00 - 17:00',
+
+        'maps_url' => $setting->contact_maps_url,
 
         'wa_number' => $setting->appointment_whatsapp_number
                             ?: $setting->contact_whatsapp
@@ -80,6 +90,12 @@ Route::get('/', function () {
         'email' => $setting->contact_email,
 
         'instagram' => $social['instagram'] ?? '',
+
+        'facebook' => $social['facebook'] ?? '',
+
+        'tiktok' => $social['tiktok'] ?? '',
+
+        'youtube' => $social['youtube'] ?? '',
 
         'hero_title' => $setting->hero_title,
 
@@ -197,6 +213,20 @@ Route::get('/', function () {
         ->orderByDesc('created_at')
         ->get();
 
+    // divisi terafiliasi
+    $affiliatedDivisions = AffiliatedDivision::query()
+        ->where('is_published', true)
+        ->orderBy('sort_order')
+        ->orderByDesc('created_at')
+        ->get()
+        ->map(fn ($d) => [
+            'letter' => $d->initial,
+            'color' => $d->color,
+            'logo' => $d->logo,
+            'name' => $d->name,
+            'desc' => $d->description,
+        ]);
+
     return view('index', compact(
         'settings',
         'misiList',
@@ -206,7 +236,8 @@ Route::get('/', function () {
         'team',
         'workflows',
         'clientPartners',
-        'services'
+        'services',
+        'affiliatedDivisions'
     ));
 })->name('home');
 
@@ -224,6 +255,9 @@ Route::middleware([EnsureAdmin::class])
             ->except(['show']);
 
         Route::resource('client-partners', ClientPartnerController::class)
+            ->except(['show']);
+
+        Route::resource('affiliated-divisions', AffiliatedDivisionController::class)
             ->except(['show']);
     });
 /*

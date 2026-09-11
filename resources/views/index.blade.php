@@ -1198,7 +1198,12 @@ NAVBAR
             {{-- =================================================
             MEMBER OF / LOGO ARADA
             ================================================== --}}
-            <div class="flex items-center gap-1.5 sm:gap-2">
+            <a
+                href="https://www.aradacorp.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1.5 sm:gap-2 group"
+            >
 
                 {{-- Tulisan Member Of tampil di desktop dan mobile --}}
 <span class="block
@@ -1208,7 +1213,9 @@ NAVBAR
              tracking-wider
              uppercase
              text-gray-500
-             whitespace-nowrap">
+             whitespace-nowrap
+             group-hover:text-brand-gold
+             transition-colors">
     Member Of
 </span>
                 {{-- Logo ARADA --}}
@@ -1218,10 +1225,12 @@ NAVBAR
                     class="h-6 sm:h-7 lg:h-8
                            w-auto
                            max-w-[85px]
-                           object-contain"
+                           object-contain
+                           transition-transform duration-300
+                           group-hover:scale-105"
                 >
 
-            </div>
+            </a>
 
 
             {{-- =================================================
@@ -1386,17 +1395,44 @@ NAVBAR
 
         {{-- =====================================================
              HERO CONTENT
-             Satu kolom
+             Terdiri dari 2 bagian sejajar (desktop/tablet):
+             1) Kotak teks (judul, deskripsi, tombol)
+             2) Logo BUMIYUJI (tanpa kotak/bungkus)
+
+             Logo diletakkan TEPAT DI SAMPING kotak teks (pakai
+             "justify-start", bukan "justify-between"), jadi
+             keduanya menempel berdekatan — tidak terpisah jauh
+             ke ujung-ujung layar.
         ====================================================== --}}
         <div class="relative h-full flex items-center px-5 sm:px-8 lg:px-12">
 
-            <div class="w-full max-w-[560px]
-                        bg-[#91a9ba]/85
-                        backdrop-blur-sm
-                        rounded-2xl
-                        shadow-2xl
-                        p-8 sm:p-10 lg:p-12
-                        text-white">
+            {{-- =================================================
+                 WRAPPER TEKS + LOGO
+                 - Mobile & tablet: ditumpuk ke bawah (flex-col), logo
+                   otomatis disembunyikan ("hidden lg:flex" di
+                   bagian logo) supaya gambar BUMIYUJI dipastikan
+                   tidak muncul di layar HP/tablet.
+                 - lg ke atas (desktop): sejajar berdampingan (flex-row),
+                   saling menempel karena "justify-start".
+
+                 UBAH JARAK ANTARA KOTAK TEKS & LOGO:
+                 ganti "gap-6 md:gap-8 lg:gap-10" di bawah — makin
+                 kecil angkanya, makin rapat jaraknya.
+            ================================================== --}}
+            <div class="w-full flex flex-col md:flex-row md:items-center
+                        justify-start gap-6 md:gap-8 lg:gap-10">
+
+                {{-- =============================================
+                     KOTAK 1: TEKS (judul, deskripsi, tombol)
+                     Tidak diubah dari sebelumnya.
+                ============================================== --}}
+                <div class="w-full max-w-[560px]
+                            bg-[#91a9ba]/85
+                            backdrop-blur-sm
+                            rounded-2xl
+                            shadow-2xl
+                            p-8 sm:p-10 lg:p-12
+                            text-white">
 
                 {{-- Label --}}
                 <span class="hero-anim block
@@ -1478,7 +1514,56 @@ NAVBAR
 
                 </div>
 
+                </div>
+                {{-- ^ tutup KOTAK 1: TEKS --}}
+
+
+                {{-- =============================================
+                     LOGO BUMIYUJI (TANPA KOTAK/BUNGKUS)
+                     =============================================
+                     Gambar logo polos, TIDAK dibungkus kotak/background
+                     apa pun — tidak ada warna latar, border, atau bayangan.
+                     Cuma gambarnya saja, opacity penuh (jelas terlihat),
+                     diletakkan sejajar di samping kotak teks.
+
+                     INI BAGIAN YANG BISA ANDA UBAH-UBAH:
+
+                     1) LEBAR LOGO
+                        ganti "w-40 md:w-48 lg:w-56 xl:w-64" di bawah.
+                        Tingginya menyesuaikan otomatis (object-contain),
+                        jadi proporsi logo tidak akan gepeng/melar.
+
+                     2) FILE GAMBAR LOGO
+                        Kalau file di "public/images/bumiyuji-icon.png"
+                        diganti dengan logo lengkap (ikon + tulisan
+                        "BUMIYUJI LIVING"), sebaiknya lebar (poin 1)
+                        dibuat lebih besar supaya tulisannya tidak
+                        terlalu kecil.
+
+                     3) KAPAN LOGO INI MUNCUL
+                        "hidden lg:flex" = disembunyikan di semua
+                        layar HP & tablet (termasuk tablet lebar/
+                        HP besar sampai ±1023px), baru muncul mulai
+                        ukuran desktop (lg, 1024px ke atas), supaya
+                        gambar BUMIYUJI ini dipastikan tidak pernah
+                        tampil di perangkat mobile. Ganti "lg" jadi
+                        "md" kalau mau logo mulai muncul lebih awal
+                        (mulai tablet, 768px).
+                ============================================== --}}
+             <div class="hidden lg:flex items-center justify-center shrink-0
+            lg:w-96 xl:w-[28rem]">
+
+                    <img
+                        src="{{ asset('images/bumiyuji-icon.png') }}"
+                        alt="{{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                        class="w-full h-auto object-contain"
+                    >
+
+                </div>
+                {{-- ^ LOGO tanpa bungkus --}}
+
             </div>
+            {{-- ^ tutup WRAPPER 2 KOTAK --}}
 
         </div>
 
@@ -3099,12 +3184,12 @@ NAVBAR
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Heading --}}
-        <div class="mb-8 lg:mb-10 reveal">
+        <div class="mb-8 lg:mb-10 reveal text-center">
             <h2 class="text-4xl sm:text-5xl lg:text-[48px] font-bold tracking-tight text-brand-forest">
                 ALUR KERJA
             </h2>
 
-            <div class="w-[76px] h-[2px] bg-brand-gold mt-2"></div>
+            <div class="w-[76px] h-[2px] bg-brand-gold mt-2 mx-auto"></div>
         </div>
 
 
@@ -4045,7 +4130,7 @@ NAVBAR
                 TESTIMONI
             </h2>
 
-            <div class="w-20 h-[1.5px] bg-black mx-auto mt-3"></div>
+            <div class="w-20 h-[1.5px] bg-brand-gold mx-auto mt-3"></div>
 
         </div>
 
@@ -4709,52 +4794,60 @@ NAVBAR
 
                 <div class="space-y-5">
 
-                    {{-- Kantor Operasional & Administrasi --}}
-                    <div class="flex items-start gap-4">
-
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </span>
-
-                        <div>
-                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                Kantor Operasional &amp; Administrasi
-                            </span>
-                            <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                Jln. Ciaul Pasir Cisarua - Cikole, Jingga Residence Blok B23
-                            </p>
-                            <p class="text-xs text-stone-500 mt-1">
-                                Kota Sukabumi - Jabar 43115
-                            </p>
-                        </div>
-
-                    </div>
-
                     {{-- Kantor Utama (Pusat & Logistik) --}}
-                    <div class="flex items-start gap-4">
+                    @if (!empty($settings['address']))
+                        <div class="flex items-start gap-4">
 
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M9 13h.01M15 10h.01M15 13h.01" />
-                            </svg>
-                        </span>
-
-                        <div>
-                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                Kantor Utama (Pusat &amp; Logistik)
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M9 13h.01M15 10h.01M15 13h.01" />
+                                </svg>
                             </span>
-                            <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                Jln. Pelabuhan II No.89B Citamiang Kota Sukabumi
-                            </p>
-                            <p class="text-xs text-stone-500 mt-1">
-                                Kec. Citamiang, Kota Sukabumi, Jawa Barat
-                            </p>
-                        </div>
 
-                    </div>
+                            <div>
+                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                    Kantor Utama (Pusat &amp; Logistik)
+                                </span>
+                                <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                    {{ $settings['address'] }}
+                                </p>
+                                @if (!empty($settings['address_note']))
+                                    <p class="text-xs text-stone-500 mt-1">
+                                        {{ $settings['address_note'] }}
+                                    </p>
+                                @endif
+                            </div>
+
+                        </div>
+                    @endif
+
+                    {{-- Kantor Operasional & Administrasi --}}
+                    @if (!empty($settings['secondary_address']))
+                        <div class="flex items-start gap-4">
+
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </span>
+
+                            <div>
+                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                    Kantor Operasional &amp; Administrasi
+                                </span>
+                                <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                    {{ $settings['secondary_address'] }}
+                                </p>
+                                @if (!empty($settings['secondary_address_note']))
+                                    <p class="text-xs text-stone-500 mt-1">
+                                        {{ $settings['secondary_address_note'] }}
+                                    </p>
+                                @endif
+                            </div>
+
+                        </div>
+                    @endif
 
                     {{-- WhatsApp Hotline --}}
                     <div class="flex items-start gap-4">
@@ -4773,63 +4866,78 @@ NAVBAR
                             <p class="text-sm font-semibold text-brand-forest leading-snug">
                                 {{ $settings['wa_number'] ?? '0813 1111 4523' }}
                             </p>
-                            <p class="text-xs text-stone-500 mt-1">
-                                Senin - Sabtu (08:00 - 17:00 WIB)
-                            </p>
+                            @if (!empty($settings['office_hours']))
+                                <p class="text-xs text-stone-500 mt-1">
+                                    {{ $settings['office_hours'] }}
+                                </p>
+                            @endif
                         </div>
 
                     </div>
 
                     {{-- Email --}}
-                    <div class="flex items-start gap-4">
+                    @if (!empty($settings['email']))
+                        <div class="flex items-start gap-4">
 
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </span>
-
-                        <div>
-                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                Surel Rekanan &amp; Bisnis
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
                             </span>
-                            <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                {{ $settings['email'] ?? 'cs.aradaofficial@gmail.com' }}
-                            </p>
-                        </div>
 
-                    </div>
+                            <div>
+                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
+                                    Surel Rekanan &amp; Bisnis
+                                </span>
+                                <p class="text-sm font-semibold text-brand-forest leading-snug">
+                                    {{ $settings['email'] }}
+                                </p>
+                            </div>
+
+                        </div>
+                    @endif
 
                 </div>
 
 
                 {{-- Peta Lokasi --}}
-                <div class="relative mt-6 rounded-2xl overflow-hidden border border-stone-200 h-[260px]">
+                @php
+                    $mapsQueryAddress = trim(($settings['address'] ?? '').' '.($settings['address_note'] ?? ''));
+                    $mapsOpenUrl = !empty($settings['maps_url'])
+                        ? $settings['maps_url']
+                        : ($mapsQueryAddress ? 'https://www.google.com/maps/search/?api=1&query='.urlencode($mapsQueryAddress) : null);
+                    $mapsEmbedUrl = $mapsQueryAddress ? 'https://www.google.com/maps?q='.urlencode($mapsQueryAddress).'&output=embed' : null;
+                @endphp
+                @if ($mapsEmbedUrl)
+                    <div class="relative mt-6 rounded-2xl overflow-hidden border border-stone-200 h-[260px]">
 
-                    <a
-                        href="https://www.google.com/maps/search/?api=1&query=Jl.+Pelabuhan+II+No.89B+Tipar+Kec.+Citamiang+Kota+Sukabumi+Jawa+Barat+43131"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand-forest shadow-md hover:bg-white transition"
-                    >
-                        Buka di Maps
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                    </a>
+                        @if ($mapsOpenUrl)
+                            <a
+                                href="{{ $mapsOpenUrl }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand-forest shadow-md hover:bg-white transition"
+                            >
+                                Buka di Maps
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
+                        @endif
 
-                    <iframe
-                        title="Lokasi Kantor Bumiyuji Living"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.6775!2d106.9256122!3d-6.9289479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68483c9276f957%3A0xf6d98b5c6b47309d!2sJl.%20Pelabuhan%20II%20No.89B%2C%20Tipar%2C%20Kec.%20Citamiang%2C%20Kota%20Sukabumi%2C%20Jawa%20Barat%2043131!5e0!3m2!1sid!2sid!4v1716550000000!5m2!1sid!2sid"
-                        width="100%"
-                        height="100%"
-                        style="border:0"
-                        loading="lazy"
-                        referrerpolicy="no-referrer"
-                        class="w-full h-full"
-                    ></iframe>
+                        <iframe
+                            title="Lokasi Kantor Bumiyuji Living"
+                            src="{{ $mapsEmbedUrl }}"
+                            width="100%"
+                            height="100%"
+                            style="border:0"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            class="w-full h-full"
+                        ></iframe>
 
-                </div>
+                    </div>
+                @endif
 
             </div>
 
@@ -4864,20 +4972,27 @@ NAVBAR
 
                         @else
 
-                            <span class="font-serif text-3xl sm:text-4xl tracking-widest font-extrabold text-brand-forest leading-none">
+                            {{-- =====================================
+                                 LOGO TEKS FALLBACK (kalau belum ada
+                                 file logo di Pengaturan Website)
+
+                                 UBAH GAYA:
+                                 - Warna "BUMIYUJI": ganti "text-brand-forest"
+                                 - Warna & jarak huruf "LIVING": ganti
+                                   "text-stone-500" / "tracking-[0.4em]"
+                                 - Panjang & warna garis bawah "LIVING":
+                                   ganti "w-16" / "bg-brand-gold" di
+                                   <span> paling bawah.
+                            ====================================== --}}
+                            <span class="font-serif text-3xl sm:text-4xl font-extrabold tracking-wide text-brand-forest leading-none">
                                 BUMIYUJI
                             </span>
 
-                            <span class="flex items-center gap-3 mt-2">
-                                <span class="h-px w-6 bg-brand-gold"></span>
-                                <span class="text-sm sm:text-base tracking-[0.35em] font-medium text-brand-forest/80">
-                                    LIVING
+                            <span class="mt-2 flex flex-col">
+                                <span class="text-xs sm:text-sm tracking-[0.4em] font-medium text-stone-500 uppercase">
+                                    Living
                                 </span>
-                                <span class="h-px w-6 bg-brand-gold"></span>
-                            </span>
-
-                            <span class="text-[10px] sm:text-[11px] tracking-[0.3em] font-semibold text-stone-400 uppercase mt-3">
-                                Interior | Furniture | Custom
+                                <span class="mt-1.5 h-px w-16 bg-brand-gold"></span>
                             </span>
 
                         @endif
@@ -4887,6 +5002,117 @@ NAVBAR
                     <p class="text-sm text-stone-500 leading-relaxed max-w-xs">
                         Mewujudkan ruang impian Anda menjadi kenyataan di Sukabumi, Jawa Barat dengan desain interior yang elegan, fungsional, dan berkualitas tinggi.
                     </p>
+
+                    {{-- =========================================
+                         IKON SOCIAL MEDIA
+                         =========================================
+                         Setiap ikon hanya MUNCUL kalau field terkait
+                         di "Pengaturan Website > Social Media" (dan
+                         Kontak > Email) SUDAH DIISI di database —
+                         kalau kosong, ikon otomatis disembunyikan
+                         (lihat "@if" di setiap ikon).
+
+                         UBAH TAMPILAN IKON:
+                         - Ukuran lingkaran: ganti "h-11 w-11"
+                         - Warna border/hover: ganti "border-brand-forest/20"
+                           dan "hover:bg-brand-forest"
+                         - Urutan ikon: pindahkan blok "@if(...) ... @endif"
+                           sesuai urutan yang diinginkan.
+
+                         MAU TAMBAH PLATFORM LAIN (mis. WhatsApp Bisnis)?
+                         Tambahkan field baru di migration + form admin
+                         "Pengaturan Website", lalu tambahkan key baru di
+                         array $settings pada routes/web.php, baru buat
+                         blok "@if" baru di sini mengikuti pola yang sama.
+                    ========================================== --}}
+                    <div class="flex items-center gap-3 mt-6">
+
+                        {{-- Instagram --}}
+                        @if(!empty($settings['instagram']))
+
+                            <a
+                                href="{{ $settings['instagram'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Instagram {{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-brand-forest/20 text-brand-forest transition-colors duration-300 hover:bg-brand-forest hover:text-white hover:border-brand-forest"
+                            >
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="18" height="18" rx="5" stroke-width="1.8"/>
+                                    <circle cx="12" cy="12" r="4" stroke-width="1.8"/>
+                                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </a>
+
+                        @endif
+
+                        {{-- Email --}}
+                        @if(!empty($settings['email']))
+
+                            <a
+                                href="mailto:{{ $settings['email'] }}"
+                                aria-label="Email {{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-brand-forest/20 text-brand-forest transition-colors duration-300 hover:bg-brand-forest hover:text-white hover:border-brand-forest"
+                            >
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </a>
+
+                        @endif
+
+                        {{-- TikTok --}}
+                        @if(!empty($settings['tiktok']))
+
+                            <a
+                                href="{{ $settings['tiktok'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="TikTok {{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-brand-forest/20 text-brand-forest transition-colors duration-300 hover:bg-brand-forest hover:text-white hover:border-brand-forest"
+                            >
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0115.54 3h-3.09v12.4a2.592 2.592 0 01-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 004.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+                                </svg>
+                            </a>
+
+                        @endif
+
+                        {{-- Facebook --}}
+                        @if(!empty($settings['facebook']))
+
+                            <a
+                                href="{{ $settings['facebook'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Facebook {{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-brand-forest/20 text-brand-forest transition-colors duration-300 hover:bg-brand-forest hover:text-white hover:border-brand-forest"
+                            >
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M13.5 21v-7.5h2.5l.5-3h-3V8.25c0-.87.25-1.46 1.49-1.46H16.5V4.14C16.22 4.1 15.26 4 14.14 4c-2.33 0-3.93 1.42-3.93 4.03V10.5H7.7v3h2.51V21h3.29z"/>
+                                </svg>
+                            </a>
+
+                        @endif
+
+                        {{-- YouTube --}}
+                        @if(!empty($settings['youtube']))
+
+                            <a
+                                href="{{ $settings['youtube'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="YouTube {{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
+                                class="flex h-11 w-11 items-center justify-center rounded-full border border-brand-forest/20 text-brand-forest transition-colors duration-300 hover:bg-brand-forest hover:text-white hover:border-brand-forest"
+                            >
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21.8 8.001s-.2-1.4-.8-2.02c-.77-.8-1.63-.8-2.03-.85C16.1 5 12 5 12 5h-.01s-4.1 0-6.97.13c-.4.05-1.26.05-2.03.85-.6.62-.8 2.02-.8 2.02S2 9.64 2 11.28v1.44c0 1.64.19 3.28.19 3.28s.2 1.4.8 2.02c.77.8 1.78.78 2.23.86 1.62.16 6.78.21 6.78.21s4.11-.01 6.98-.14c.4-.05 1.26-.05 2.03-.85.6-.62.8-2.02.8-2.02s.19-1.64.19-3.28v-1.44c0-1.64-.19-3.28-.19-3.28zM9.99 14.98v-5.7l5.4 2.86-5.4 2.84z"/>
+                                </svg>
+                            </a>
+
+                        @endif
+
+                    </div>
 
                     <a
                         href="{{ route('admin.login') }}"
@@ -4950,20 +5176,31 @@ NAVBAR
 
                     <div class="space-y-4">
 
-                        @foreach ([
-                            ['letter' => 'A', 'color' => '#2C3E35', 'name' => 'CV. Afkara Putra Multimedia', 'desc' => 'IT, Networking & Pengadaan'],
-                            ['letter' => 'Y', 'color' => '#1F6F78', 'name' => 'CV. Yuji Sabumi Perkasa', 'desc' => 'Interior, Custom Furniture'],
-                            ['letter' => 'M', 'color' => '#2C6E9E', 'name' => 'CV. Indonesia Muda Pratama', 'desc' => 'General Contractor Konsultan Perencanaan dan Pengawasan'],
-                        ] as $divisi)
+                        @forelse ($affiliatedDivisions as $divisi)
 
                             <div class="flex items-start gap-4 rounded-2xl border border-brand-gold/20 bg-white/60 p-4">
 
-                                <span
-                                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-cream border border-brand-gold/20 font-serif font-extrabold text-lg"
-                                    style="color: {{ $divisi['color'] }};"
-                                >
-                                    {{ $divisi['letter'] }}
-                                </span>
+                                @if (!empty($divisi['logo']))
+
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-brand-gold/20">
+                                        <img
+                                            src="{{ Storage::url($divisi['logo']) }}"
+                                            alt="{{ $divisi['name'] }}"
+                                            loading="lazy"
+                                            class="h-full w-full object-contain p-1.5"
+                                        >
+                                    </span>
+
+                                @else
+
+                                    <span
+                                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-cream border border-brand-gold/20 font-serif font-extrabold text-lg"
+                                        style="color: {{ $divisi['color'] }};"
+                                    >
+                                        {{ $divisi['letter'] }}
+                                    </span>
+
+                                @endif
 
                                 <div>
                                     <p class="text-sm font-bold text-brand-forest leading-snug">
@@ -4976,7 +5213,11 @@ NAVBAR
 
                             </div>
 
-                        @endforeach
+                        @empty
+
+                            <p class="text-xs text-stone-400">Belum ada divisi terafiliasi.</p>
+
+                        @endforelse
 
                     </div>
 
