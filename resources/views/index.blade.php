@@ -17,9 +17,9 @@
                 extend: {
                     colors: {
                         brand: {
-                            forest: '#2C3E35',
-                            gold: '#C5A880',
-                            cream: '#F9F6F0',
+                            forest: '#30483F',
+                            gold: '#B9A56F',
+                            cream: '#F7F1E5',
                             charcoal: '#1E1E1E',
                         }
                     },
@@ -33,7 +33,7 @@
                            "font-serif" dipakai di semua judul (h1-h6) di
                            seluruh halaman, jadi cukup ganti di sini saja.
                         ====================================================== */
-                        serif: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
                     },
                 }
             }
@@ -46,13 +46,60 @@
          Sans. Bobot 400-800 disiapkan supaya H1 (700/800), H2 (700),
          H3 (600/700) semua tersedia.
     ========================================================== --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <!-- =========================================================
+     FONT BUMIYUJI
+========================================================= -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+<link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+    /* Font utama seluruh halaman */
+    body {
+        font-family: 'Manrope', sans-serif;
+    }
+
+    /* Font elegan untuk heading */
+    h1,
+    h2,
+    h3,
+    h4,
+    .font-serif {
+        font-family: 'Cormorant Garamond', serif;
+    }
+</style>
+
+    {{-- =========================================================
+         FONTAWESOME    
+    ========================================================== --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* BUMIYUJI PREMIUM POLISH */
+        .byj-section-label { display:inline-flex; align-items:center; gap:.7rem; }
+        .byj-section-label::before, .byj-section-label::after { content:''; width:28px; height:1px; background:rgba(185,165,111,.75); }
+        .byj-glass { background:rgba(255,255,255,.72); border:1px solid rgba(48,72,63,.10); box-shadow:0 24px 60px -36px rgba(48,72,63,.42); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+        .byj-stat { position:relative; transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease; }
+        .byj-stat:hover { transform:translateY(-4px); box-shadow:0 18px 40px -28px rgba(48,72,63,.55); }
+        .byj-stat:not(:last-child)::after { content:''; position:absolute; top:18%; right:0; width:1px; height:64%; background:rgba(48,72,63,.12); }
+        .byj-feature-card { position:relative; overflow:hidden; min-height:360px; border-radius:26px; isolation:isolate; }
+        .byj-feature-card::after { content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,rgba(18,27,24,.02) 20%,rgba(18,27,24,.82) 100%); pointer-events:none; }
+        .byj-feature-card img { transition:transform .9s cubic-bezier(.22,1,.36,1),filter .5s ease; }
+        .byj-feature-card:hover img { transform:scale(1.06); filter:saturate(1.05); }
+        .byj-feature-number { position:absolute; top:18px; right:18px; z-index:3; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:999px; color:#fff; background:rgba(48,72,63,.62); border:1px solid rgba(255,255,255,.22); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); font-size:11px; font-weight:700; }
+        .byj-feature-content { position:absolute; left:0; right:0; bottom:0; z-index:3; padding:24px; color:#fff; }
+        .byj-float-wa { box-shadow:0 16px 36px -18px rgba(0,0,0,.45); }
+        @media (max-width:640px) {
+            .byj-stat:not(:last-child)::after { display:none; }
+            .byj-feature-card { min-height:270px; border-radius:20px; }
+            .byj-feature-content { padding:16px; }
+        }
+    </style>
+
 
     {{-- =========================================================
          CUSTOM CSS
@@ -73,7 +120,7 @@
         h5,
         h6,
         .font-serif {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Cormorant Garamond', serif;
         }
 
         .font-sans {
@@ -116,6 +163,16 @@
             .hero-bg-zoom {
                 animation: none !important;
             }
+
+            .hero-parallax {
+                transform: none !important;
+            }
+
+            .hero-line-grow {
+                animation: none !important;
+                transform: none !important;
+                opacity: 1 !important;
+            }
         }
 
         /* =====================================================
@@ -133,15 +190,19 @@
         }
 
         .hero-anim:nth-child(2) {
-            animation-delay: .2s;
+            animation-delay: .5s;
         }
 
         .hero-anim:nth-child(3) {
-            animation-delay: .3s;
+            animation-delay: .65s;
         }
 
         .hero-anim:nth-child(4) {
-            animation-delay: .4s;
+            animation-delay: .8s;
+        }
+
+        .hero-anim:nth-child(5) {
+            animation-delay: .95s;
         }
 
         @keyframes heroIn {
@@ -151,8 +212,43 @@
             }
         }
 
+        /* =====================================================
+           HERO LINE GROW
+           Garis gold di atas card tumbuh dari kiri (scaleX 0 -> 1)
+           SEBELUM label/judul/deskripsi/tombol muncul (lihat delay
+           di ".hero-anim:nth-child" di atas, semua dimulai setelah
+           garis ini selesai).
+        ====================================================== */
+
+        .hero-line-grow {
+            transform-origin: left center;
+            transform: scaleX(0);
+            opacity: .5;
+            animation: heroLineGrow .55s cubic-bezier(.16,.8,.24,1) forwards;
+        }
+
+        @keyframes heroLineGrow {
+            to {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
         .hero-bg-zoom {
             animation: heroZoom 18s ease-in-out infinite alternate;
+        }
+
+        /* =====================================================
+           HERO PARALLAX
+           Wrapper ".hero-parallax" digeser sedikit via JS saat
+           discroll (lebih lambat dari card teks), memberi kesan
+           depth/cinematic. Transform di-set lewat JS supaya tidak
+           bentrok dengan animasi "heroZoom" (scale) milik anak
+           ".hero-bg-zoom" di dalamnya.
+           Ubah kecepatan: ganti angka "heroParallaxSpeed" di script.
+        ====================================================== */
+        .hero-parallax {
+            will-change: transform;
         }
 
         @keyframes heroZoom {
@@ -176,26 +272,34 @@
     justify-content: center;
     padding: 10px 20px;
     border-radius: 9999px;
-    color: #374151;
+    color: #30483F;
     background: transparent;
     border: 1px solid transparent;
-    transition: all .3s ease;
+    transition:
+        background-color .45s cubic-bezier(.22,1,.36,1),
+        color .45s cubic-bezier(.22,1,.36,1),
+        border-color .45s cubic-bezier(.22,1,.36,1),
+        box-shadow .45s cubic-bezier(.22,1,.36,1),
+        transform .3s cubic-bezier(.22,1,.36,1);
     white-space: nowrap;
 }
 
-/* Hover */
+/* Hover — TIDAK pakai warna beda lagi (sebelumnya biru). Bedanya
+   sekarang cuma dari shadow + latar transparan bernuansa forest,
+   warna teksnya tetap sama seperti kondisi normal. */
 .nav-link:hover {
-    background: #f1f5f9;
-    color: #8da9bd;
+    background: rgba(48, 72, 63, 0.07);
+    color: #30483F;
+    box-shadow: 0 4px 14px rgba(48, 72, 63, 0.15);
     transform: translateY(-1px);
 }
 
 /* Menu yang sedang aktif */
 .nav-link.active {
-    background: #8da9bd;
+    background: #8D9070;
     color: #ffffff !important;
-    border-color: #8da9bd;
-    box-shadow: 0 4px 12px rgba(141, 169, 189, 0.30);
+    border-color: #8D9070;
+    box-shadow: 0 4px 12px rgba(141, 144, 112, 0.30);
 }
 
 /* Hilangkan garis bawah lama */
@@ -203,9 +307,12 @@
     display: none;
 }
 
-/* Header saat discroll */
+/* Header saat discroll — opacity dinaikkan (blur tetap jalan) supaya
+   tulisan/menu tetap gampang dibaca di atas konten yang beragam warna
+   saat halaman digulir, plus shadow bernuansa gold. */
 #site-header.scrolled {
-    box-shadow: 0 8px 24px -12px rgba(30, 30, 30, .25);
+    background-color: rgba(239, 228, 207, 0.92);
+    box-shadow: 0 8px 24px -12px rgba(185, 165, 111, .35);
 }
 
         /* =====================================================
@@ -283,6 +390,94 @@
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+        }
+
+        /* =====================================================
+           FORM CARD — FOCUS ELEVATION
+           Card form (".form-card") sedikit terangkat + shadow
+           menguat saat salah satu field di dalamnya sedang diisi
+           (:focus-within), memberi kesan form "merespons" interaksi.
+        ====================================================== */
+
+        .form-card:focus-within {
+            box-shadow: 0 20px 45px -18px rgba(48, 72, 63, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .form-card {
+            transition: box-shadow .5s cubic-bezier(.22,1,.36,1),
+                        transform .5s cubic-bezier(.22,1,.36,1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .form-card {
+                transition: none;
+            }
+
+            .form-card:focus-within {
+                transform: none;
+            }
+        }
+
+           Dipakai di judul card Layanan & Portfolio (class
+           "title-underline"). Saat card (".group") di-hover,
+           garis gold muncul dari TENGAH ke samping di bawah judul.
+           Tidak menyentuh garis gold statis yang sudah ada di
+           bawah judul — ini elemen terpisah (::after) di teks judul.
+        ====================================================== */
+
+        .title-underline {
+            position: relative;
+            display: inline-block;
+        }
+
+        .title-underline::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -4px;
+            height: 2px;
+            width: 0;
+            background: #B9A56F;
+            transition:
+                width .45s cubic-bezier(.22,1,.36,1),
+                left .45s cubic-bezier(.22,1,.36,1);
+        }
+
+        .group:hover .title-underline::after {
+            width: 100%;
+            left: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .title-underline::after {
+                transition: none;
+            }
+        }
+
+        /* =====================================================
+           SECTION DIVIDER — GROW ON SCROLL
+           Dipakai di garis gold bawah judul beberapa section
+           (class "divider-grow"). Garis "tumbuh" dari 0 ke lebar
+           penuh saat section pertama kali terlihat di layar.
+           Tambahkan "origin-left" untuk garis yang rata kiri,
+           atau "origin-center" untuk garis yang di tengah (mx-auto).
+        ====================================================== */
+
+        .divider-grow {
+            transform: scaleX(0);
+            transition: transform .9s cubic-bezier(.22,1,.36,1);
+        }
+
+        .divider-grow.divider-in-view {
+            transform: scaleX(1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .divider-grow {
+                transition: none;
+                transform: scaleX(1);
+            }
         }
 
          /* CSS lainnya */
@@ -880,7 +1075,7 @@
             border: 1px solid rgba(44, 62, 53, .16);
             border-radius: 999px;
             background: rgba(255, 255, 255, .96);
-            color: #2C3E35;
+            color: #30483F;
             box-shadow: 0 8px 24px rgba(30, 30, 30, .14);
             cursor: pointer;
             transition: background-color .25s ease,
@@ -896,7 +1091,7 @@
         }
 
         .portfolio-arrow:hover {
-            background: #2C3E35;
+            background: #30483F;
             color: #fff;
             box-shadow: 0 10px 28px rgba(30, 30, 30, .20);
         }
@@ -906,7 +1101,7 @@
         }
 
         .portfolio-arrow:focus-visible {
-            outline: 2px solid #C5A880;
+            outline: 2px solid #B9A56F;
             outline-offset: 3px;
         }
 
@@ -1044,92 +1239,154 @@
 
 <body class="font-sans bg-brand-cream text-brand-charcoal antialiased">
 
+<div id="byj-scroll-progress" class="fixed top-0 left-0 z-[100] h-[2px] w-0 bg-[#B9A56F] transition-none"></div>
+
+{{-- =========================================================
+     PALETTE BUMIYUJI
+     Blue   : #86A2B9
+     Sage   : #8D9070
+     Forest : #30483F
+     Cream  : #F7F1E5
+========================================================= --}}
+
+
 {{-- =========================================================
      TOP INFO BAR
 ========================================================= --}}
-<div class="bg-brand-forest text-brand-gold text-xs py-2 px-4 border-b border-brand-gold/20">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+<div class="w-full bg-[#A1A189] text-white text-xs
+            border-b border-[#8E8F79]">
 
-        <span class="flex items-center gap-1.5 text-center sm:text-left">
-            <svg class="w-3.5 h-3.5 shrink-0"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{ $settings['address'] ?? 'Sukabumi, Jawa Barat' }}
-        </span>
+        <div class="min-h-[32px]
+                    flex items-center justify-between
+                    gap-4">
 
-        <span class="flex items-center gap-1">
-            <svg class="w-3.5 h-3.5"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            {{-- Alamat --}}
+            <span class="flex items-center gap-2
+                         text-white/95
+                         truncate">
 
-            {{ $settings['office_hours'] ?? 'Senin - Sabtu: 08:00 - 17:00' }}
-        </span>
+                <svg class="w-3.5 h-3.5 shrink-0 text-[#F7F1E5]"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+
+                </svg>
+
+                <span>
+                    {{ $settings['address'] ?? 'Sukabumi, Jawa Barat' }}
+                </span>
+
+            </span>
+
+
+            {{-- Jam kerja --}}
+            <span class="hidden sm:flex
+                         items-center gap-2
+                         whitespace-nowrap
+                         text-white/95">
+
+                <svg class="w-3.5 h-3.5"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+                </svg>
+
+                <span>
+                    {{ $settings['office_hours'] ?? 'Senin - Sabtu (08:00 - 17:00 WIB)' }}
+                </span>
+
+            </span>
+
+        </div>
 
     </div>
+
 </div>
 
 
 {{-- =========================================================
-NAVBAR
+     MAIN NAVBAR
 ========================================================= --}}
-
 <header id="site-header"
-    class="sticky top-0 z-50 bg-white transition-shadow duration-300">
+        class="sticky top-0 z-50
+               bg-[#F2EBDD]/75
+               backdrop-blur-md
+               backdrop-saturate-150
+               border-b border-[#B9A56F]/20
+               shadow-[0_2px_16px_rgba(48,72,63,0.08)]
+               transition-all duration-300">
 
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
-                min-h-20 py-3
-                flex items-center justify-between gap-3">
+    <nav class="max-w-7xl mx-auto
+                px-4 sm:px-6 lg:px-8
+                min-h-[72px]
+                flex items-center
+                justify-between
+                gap-3">
+
 
         {{-- =====================================================
-        LOGO BUMIYUJI
+             LOGO BUMIYUJI
         ====================================================== --}}
         <a href="#beranda"
-            class="flex items-center gap-3 group shrink-0 min-w-0">
+           class="flex items-center
+                  shrink-0
+                  group">
 
             @if(!empty($settings['logo_url']))
 
+                {{-- LOGO ASLI DARI DATABASE --}}
                 <img
                     src="{{ $settings['logo_url'] }}"
                     alt="{{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
-                    class="h-9 sm:h-10 lg:h-11 w-auto max-w-[150px] object-contain
-                           transition-transform duration-300
-                           group-hover:scale-105"
+                    class="h-9 sm:h-10 lg:h-11
+                           w-auto
+                           max-w-[155px]
+                           object-contain
+                           transition-transform
+                           duration-300
+                           group-hover:scale-[1.03]"
                 >
 
             @else
 
-                <span class="flex flex-col">
+                {{-- FALLBACK --}}
+                <div class="flex flex-col">
 
-                    <span class="font-serif text-lg sm:text-xl
-                                 tracking-widest font-bold
-                                 text-brand-forest leading-none">
+                    <span class="font-serif
+                                 text-lg
+                                 tracking-[0.18em]
+                                 font-bold
+                                 text-[#30483F]
+                                 leading-none">
                         BUMIYUJI
                     </span>
 
-                    <span class="text-[8px] sm:text-[9px]
-                                 tracking-[0.25em]
-                                 text-brand-gold mt-1">
+                    <span class="text-[8px]
+                                 tracking-[0.28em]
+                                 text-[#8D9070]
+                                 mt-1">
                         L I V I N G
                     </span>
 
-                </span>
+                </div>
 
             @endif
 
@@ -1137,96 +1394,213 @@ NAVBAR
 
 
         {{-- =====================================================
-        DESKTOP NAVIGATION
+             DESKTOP NAVIGATION
         ====================================================== --}}
-        <div class="hidden md:flex items-center gap-1 lg:gap-2
-                    text-sm flex-1 justify-center">
+        <div class="hidden md:flex
+                    items-center
+                    justify-center
+                    gap-1.5 lg:gap-2
+                    flex-1">
 
+
+            {{-- =====================================================
+                 LINK NAVBAR: BERANDA
+                 href="#beranda" -> menuju {{-- =========================================================
+     TARGET ANCHOR: BERANDA
+     Navbar: <a href="#beranda">Beranda</a>
+     Menu tersebut akan scroll langsung ke section ini.
+========================================================= --}}
+<section id="beranda">
+                 Jika ingin mengubah tujuan menu Beranda, ubah href-nya.
+            ====================================================== --}}
+            {{-- BERANDA --}}
             <a href="#beranda"
-                class="nav-link px-3 lg:px-5 py-2 rounded-full
-                       border border-[#9bb0bf]
-                       text-brand-forest
-                       hover:bg-[#8da9bd] hover:text-white
-                       transition whitespace-nowrap">
+               class="nav-link
+                      px-4 lg:px-5
+                      py-2.5
+                      rounded-full
+                      border border-[#B8C2C5]
+                      bg-transparent
+                      text-[#30483F]
+                      text-sm
+                      font-medium
+                      hover:bg-[#30483F]/10
+                      hover:border-[#30483F]/20
+                      hover:text-[#30483F]
+                      hover:shadow-md
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
                 Beranda
+
             </a>
 
+
+            {{-- =====================================================
+                 LINK NAVBAR: TENTANG KAMI
+                 href="#tentang" -> menuju <section id="tentang">
+                 KEDUANYA HARUS SAMA: "tentang"
+            ====================================================== --}}
+            {{-- TENTANG KAMI --}}
             <a href="#tentang"
-                class="nav-link px-3 lg:px-5 py-2 rounded-full
-                       border border-[#9bb0bf]
-                       text-brand-forest
-                       hover:bg-[#8da9bd] hover:text-white
-                       transition whitespace-nowrap">
+               class="nav-link
+                      px-4 lg:px-5
+                      py-2.5
+                      rounded-full
+                      border border-[#B8C2C5]
+                      bg-transparent
+                      text-[#30483F]
+                      text-sm
+                      font-medium
+                      hover:bg-[#30483F]/10
+                      hover:border-[#30483F]/20
+                      hover:text-[#30483F]
+                      hover:shadow-md
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
                 Tentang Kami
+
             </a>
 
+
+            {{-- =====================================================
+                 LINK NAVBAR: INFORMASI
+                 href="#layanan" -> menuju <section id="layanan">
+                 Jadi menu "Informasi" saat diklik scroll ke section Layanan.
+            ====================================================== --}}
+            {{-- INFORMASI --}}
             <a href="#layanan"
-                class="nav-link px-3 lg:px-5 py-2 rounded-full
-                       border border-[#9bb0bf]
-                       text-brand-forest
-                       hover:bg-[#8da9bd] hover:text-white
-                       transition whitespace-nowrap">
+               class="nav-link
+                      px-4 lg:px-5
+                      py-2.5
+                      rounded-full
+                      border border-[#B8C2C5]
+                      bg-transparent
+                      text-[#30483F]
+                      text-sm
+                      font-medium
+                      hover:bg-[#30483F]/10
+                      hover:border-[#30483F]/20
+                      hover:text-[#30483F]
+                      hover:shadow-md
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
                 Informasi
+
             </a>
 
+
+            {{-- =====================================================
+                 LINK NAVBAR: PORTOFOLIO
+                 href="#portofolio" -> menuju <section id="portofolio">
+                 Pastikan ejaan "portofolio" sama persis.
+            ====================================================== --}}
+            {{-- PORTOFOLIO --}}
             <a href="#portofolio"
-                class="nav-link px-3 lg:px-5 py-2 rounded-full
-                       border border-[#9bb0bf]
-                       text-brand-forest
-                       hover:bg-[#8da9bd] hover:text-white
-                       transition whitespace-nowrap">
+               class="nav-link
+                      px-4 lg:px-5
+                      py-2.5
+                      rounded-full
+                      border border-[#B8C2C5]
+                      bg-transparent
+                      text-[#30483F]
+                      text-sm
+                      font-medium
+                      hover:bg-[#30483F]/10
+                      hover:border-[#30483F]/20
+                      hover:text-[#30483F]
+                      hover:shadow-md
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
                 Portofolio
+
             </a>
 
+
+            {{-- =====================================================
+                 LINK NAVBAR: KONTAK
+                 href="#kontak" -> menuju <section id="kontak">
+            ====================================================== --}}
+            {{-- KONTAK --}}
             <a href="#kontak"
-                class="nav-link px-3 lg:px-5 py-2 rounded-full
-                       border border-[#9bb0bf]
-                       text-brand-forest
-                       hover:bg-[#8da9bd] hover:text-white
-                       transition whitespace-nowrap">
+               class="nav-link
+                      px-4 lg:px-5
+                      py-2.5
+                      rounded-full
+                      border border-[#B8C2C5]
+                      bg-transparent
+                      text-[#30483F]
+                      text-sm
+                      font-medium
+                      hover:bg-[#30483F]/10
+                      hover:border-[#30483F]/20
+                      hover:text-[#30483F]
+                      hover:shadow-md
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
                 Kontak
+
             </a>
 
         </div>
 
 
         {{-- =====================================================
-        RIGHT SIDE
+             RIGHT SIDE
         ====================================================== --}}
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div class="flex items-center
+                    gap-2 sm:gap-3
+                    shrink-0">
+
 
             {{-- =================================================
-            MEMBER OF / LOGO ARADA
+                 MEMBER OF ARADA
+                 Sekarang selalu tampil (termasuk di HP), tidak lagi
+                 disembunyikan sampai layar lg. Label teks "Member Of"
+                 disembunyikan di layar paling sempit supaya muat,
+                 logo tetap selalu kelihatan (ukurannya mengecil di
+                 mobile lalu membesar lagi di sm/lg).
             ================================================== --}}
-            <a
-                href="https://www.aradacorp.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center gap-1.5 sm:gap-2 group"
-            >
+            <a href="https://www.aradacorp.com/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="flex
+                      items-center
+                      gap-1 sm:gap-2
+                      group
+                      shrink-0">
 
-                {{-- Tulisan Member Of tampil di desktop dan mobile --}}
-<span class="block
-             font-['Manrope']
-             text-[8px] sm:text-[9px] lg:text-[10px]
-             font-semibold
-             tracking-wider
-             uppercase
-             text-gray-500
-             whitespace-nowrap
-             group-hover:text-brand-gold
-             transition-colors">
-    Member Of
-</span>
-                {{-- Logo ARADA --}}
+                <span class="hidden sm:inline
+                             text-[9px]
+                             uppercase
+                             tracking-wider
+                             font-medium
+                             text-[#78827E]
+                             whitespace-nowrap">
+
+                    Member Of
+
+                </span>
+
+                {{-- NAMA FILE TETAP SESUAI KODE ASLI --}}
                 <img
                     src="{{ asset('images/logoarada.png') }}"
                     alt="ARADA"
-                    class="h-6 sm:h-7 lg:h-8
+                    class="h-5 sm:h-6 lg:h-7
                            w-auto
-                           max-w-[85px]
+                           max-w-[60px] sm:max-w-[70px] lg:max-w-[85px]
                            object-contain
-                           transition-transform duration-300
+                           transition-transform
+                           duration-300
                            group-hover:scale-105"
                 >
 
@@ -1234,67 +1608,120 @@ NAVBAR
 
 
             {{-- =================================================
-            CTA
+                 KONSULTASI GRATIS
             ================================================== --}}
-            <a
-                href="https://wa.me/{{ $settings['wa_number'] ?? '6281311114523' }}?text=Halo%20Bumiyuji%2C%20saya%20ingin%20berkonsultasi%20mengenai%20desain%20interior."
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hidden sm:inline-flex
-                       items-center justify-center
-                       bg-[#a8b29a]
-                       text-white
-                       font-semibold
-                       text-xs
-                       uppercase
-                       px-4 lg:px-6
-                       py-3
-                       rounded-full
-                       transition
-                       hover:opacity-90
-                       whitespace-nowrap">
+            <a href="https://wa.me/{{ $settings['wa_number'] ?? '6281311114523' }}?text=Halo%20Bumiyuji%2C%20saya%20ingin%20berkonsultasi%20mengenai%20desain%20interior."
+               target="_blank"
+               rel="noopener noreferrer"
+               class="hidden sm:inline-flex
+                      items-center
+                      justify-center
+                      gap-2
+                      px-4 lg:px-6
+                      py-3
+                      rounded-full
+                      bg-[#8D9070]
+                      text-white
+                      text-xs
+                      font-semibold
+                      uppercase
+                      shadow-sm
+                      hover:bg-[#777A5F]
+                      hover:shadow-md
+                      hover:-translate-y-0.5
+                      transition-all
+                      duration-200
+                      whitespace-nowrap">
+
+                <svg class="w-4 h-4"
+                     fill="currentColor"
+                     viewBox="0 0 24 24">
+
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+
+                </svg>
+
                 Konsultasi Gratis
+
             </a>
 
 
             {{-- =================================================
-            MOBILE BUTTON
+                 DASHBOARD ADMIN
             ================================================== --}}
-            <button
-                id="mobile-menu-btn"
-                type="button"
-                aria-label="Buka menu"
-                aria-expanded="false"
-                class="md:hidden
-                       relative
-                       h-10
-                       w-10
-                       shrink-0
-                       flex flex-col
-                       items-center
-                       justify-center
-                       gap-1.5
-                       rounded
-                       border
-                       border-brand-forest/15
-                       text-brand-forest">
+            @auth('admin')
 
-                <span
-                    class="hamburger-line block h-0.5 w-5
-                           bg-brand-forest
-                           transition-all duration-300">
+                <a href="{{ url('/admin') }}"
+                   class="hidden lg:inline-flex
+                          items-center
+                          justify-center
+                          gap-2
+                          px-5 lg:px-6
+                          py-3
+                          rounded-full
+                          bg-[#30483F]
+                          text-white
+                          text-xs
+                          font-semibold
+                          shadow-sm
+                          hover:bg-[#263A34]
+                          hover:shadow-md
+                          hover:-translate-y-0.5
+                          transition-all
+                          duration-200
+                          whitespace-nowrap">
+
+                    <svg class="w-3.5 h-3.5"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+
+                    </svg>
+
+                    Kembali ke Dashboard
+
+                </a>
+
+            @endauth
+
+
+            {{-- =================================================
+                 MOBILE MENU BUTTON
+            ================================================== --}}
+            <button id="mobile-menu-btn"
+                    type="button"
+                    aria-label="Buka menu"
+                    aria-expanded="false"
+                    class="md:hidden
+                           w-10 h-10
+                           flex flex-col
+                           items-center
+                           justify-center
+                           gap-1.5
+                           rounded-full
+                           border border-[#B8C2C5]
+                           text-[#30483F]
+                           hover:bg-[#ECE9DE]
+                           transition">
+
+                <span class="block w-5 h-0.5
+                             bg-[#30483F]
+                             rounded-full">
                 </span>
 
-                <span
-                    class="hamburger-line block h-0.5 w-5
-                           bg-brand-forest
-                           transition-all duration-300">
+                <span class="block w-5 h-0.5
+                             bg-[#30483F]
+                             rounded-full">
                 </span>
 
-                <span
-                    class="hamburger-line block h-0.5 w-5
-                           bg-brand-forest
-                           transition-all duration-300">
+                <span class="block w-5 h-0.5
+                             bg-[#30483F]
+                             rounded-full">
                 </span>
 
             </button>
@@ -1305,48 +1732,157 @@ NAVBAR
 
 
     {{-- =========================================================
-    MOBILE MENU
+         MOBILE MENU
+    ========================================================== --}}
+    {{-- =========================================================
+         CATATAN ANCHOR MENU MOBILE
+         Menu mobile memakai href yang sama dengan navbar desktop.
+         Contoh: href="#tentang" -> id="tentang".
     ========================================================== --}}
     <div id="mobile-menu"
-        class="md:hidden bg-white border-t border-gray-100">
+         class="md:hidden
+                border-t border-[#DDE2E1]
+                bg-[#F7F1E5]">
 
-        <div class="px-4 sm:px-6 py-4 flex flex-col gap-1">
+        <div class="px-4 sm:px-6 py-4
+                    flex flex-col gap-1">
+
 
             <a href="#beranda"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
+               class="mobile-nav-link
+                      px-4 py-3
+                      rounded-xl
+                      text-[#30483F]
+                      hover:bg-[#30483F]/10
+                      hover:text-[#30483F]
+                      transition">
+
                 Beranda
+
             </a>
+
 
             <a href="#tentang"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
+               class="mobile-nav-link
+                      px-4 py-3
+                      rounded-xl
+                      text-[#30483F]
+                      hover:bg-[#30483F]/10
+                      hover:text-[#30483F]
+                      transition">
+
                 Tentang Kami
+
             </a>
+
 
             <a href="#layanan"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
+               class="mobile-nav-link
+                      px-4 py-3
+                      rounded-xl
+                      text-[#30483F]
+                      hover:bg-[#30483F]/10
+                      hover:text-[#30483F]
+                      transition">
+
                 Informasi
+
             </a>
+
 
             <a href="#portofolio"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
+               class="mobile-nav-link
+                      px-4 py-3
+                      rounded-xl
+                      text-[#30483F]
+                      hover:bg-[#30483F]/10
+                      hover:text-[#30483F]
+                      transition">
+
                 Portofolio
+
             </a>
 
-            <a href="#alur-kerja"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
-                Alur Kerja
-            </a>
 
             <a href="#kontak"
-                class="mobile-nav-link px-3 py-3 rounded
-                       hover:bg-brand-cream transition">
+               class="mobile-nav-link
+                      px-4 py-3
+                      rounded-xl
+                      text-[#30483F]
+                      hover:bg-[#30483F]/10
+                      hover:text-[#30483F]
+                      transition">
+
                 Kontak
+
             </a>
+
+
+            {{-- KONSULTASI MOBILE --}}
+            <a href="https://wa.me/{{ $settings['wa_number'] ?? '6281311114523' }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="mt-2
+                      flex items-center
+                      justify-center
+                      gap-2
+                      px-5 py-3
+                      rounded-full
+                      bg-[#8D9070]
+                      text-white
+                      text-xs
+                      font-semibold
+                      uppercase
+                      hover:bg-[#777A5F]
+                      transition">
+
+                <svg class="w-4 h-4"
+                     fill="currentColor"
+                     viewBox="0 0 24 24">
+
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+
+                </svg>
+
+                Konsultasi Gratis
+
+            </a>
+
+
+            {{-- DASHBOARD MOBILE --}}
+            @auth('admin')
+
+                <a href="{{ url('/admin') }}"
+                   class="mt-2
+                          flex items-center
+                          justify-center
+                          gap-2
+                          px-5 py-3
+                          rounded-full
+                          bg-[#30483F]
+                          text-white
+                          text-xs
+                          font-semibold
+                          hover:bg-[#263A34]
+                          transition">
+
+                    <svg class="w-3.5 h-3.5"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+
+                    </svg>
+
+                    Kembali ke Dashboard
+
+                </a>
+
+            @endauth
 
         </div>
 
@@ -1357,13 +1893,22 @@ NAVBAR
      HERO
 ========================================================= --}}
 <section id="beranda"
-         class="relative bg-white overflow-hidden px-2 sm:px-3 lg:px-4 py-0">
+         class="relative bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 overflow-hidden px-2 sm:px-3 lg:px-4 py-0">
 
     <div class="relative w-full
                 h-[680px] sm:h-[720px] lg:h-[760px]
                 rounded-[28px] overflow-hidden">
 
-        {{-- Background Hero --}}
+        {{-- =====================================================
+             HERO PARALLAX WRAPPER
+             Div pembungkus baru HANYA untuk efek parallax (background
+             bergerak sedikit lebih lambat saat discroll). Logic gambar
+             (Storage::url / asset) di dalam @if/@else TIDAK diubah.
+             Kecepatan parallax diatur di variabel JS "heroParallaxSpeed".
+        ====================================================== --}}
+        <div class="hero-parallax absolute inset-0 overflow-hidden" data-hero-parallax>
+
+        {{-- BACKGROUND HERO --}}
         @if($setting?->hero_image)
 
             <div
@@ -1380,205 +1925,203 @@ NAVBAR
 
         @endif
 
+        </div>
+        {{-- END HERO PARALLAX WRAPPER --}}
 
-        {{-- Overlay --}}
+
+
+        {{-- OVERLAY --}}
         <div class="absolute inset-0 bg-black/10"></div>
 
-        {{-- =====================================================
-             DEPTH GRADIENT
-             Gradient sangat halus di bagian bawah hero supaya
-             ada kedalaman (depth), tanpa mengubah gambar/warna
-             brand. Hapus baris ini jika ingin menghilangkan efek.
-        ====================================================== --}}
-        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/25 to-transparent"></div>
+        {{-- DEPTH GRADIENT --}}
+        <div class="pointer-events-none absolute inset-x-0 bottom-0
+                    h-40 bg-gradient-to-t
+                    from-black/25 to-transparent">
+        </div>
 
 
         {{-- =====================================================
              HERO CONTENT
-             Terdiri dari 2 bagian sejajar (desktop/tablet):
-             1) Kotak teks (judul, deskripsi, tombol)
-             2) Logo BUMIYUJI (tanpa kotak/bungkus)
-
-             Logo diletakkan TEPAT DI SAMPING kotak teks (pakai
-             "justify-start", bukan "justify-between"), jadi
-             keduanya menempel berdekatan — tidak terpisah jauh
-             ke ujung-ujung layar.
         ====================================================== --}}
-        <div class="relative h-full flex items-center px-5 sm:px-8 lg:px-12">
+        <div class="relative h-full flex items-center
+                    justify-center
+                    px-2 sm:px-6 lg:px-12">
 
-            {{-- =================================================
-                 WRAPPER TEKS + LOGO
-                 - Mobile & tablet: ditumpuk ke bawah (flex-col), logo
-                   otomatis disembunyikan ("hidden lg:flex" di
-                   bagian logo) supaya gambar BUMIYUJI dipastikan
-                   tidak muncul di layar HP/tablet.
-                 - lg ke atas (desktop): sejajar berdampingan (flex-row),
-                   saling menempel karena "justify-start".
+            <div class="w-full
+                        flex flex-col
+                        items-center
+                        lg:flex-row
+                        lg:items-center
+                        lg:justify-start
+                        gap-2 sm:gap-6 lg:gap-10">
 
-                 UBAH JARAK ANTARA KOTAK TEKS & LOGO:
-                 ganti "gap-6 md:gap-8 lg:gap-10" di bawah — makin
-                 kecil angkanya, makin rapat jaraknya.
-            ================================================== --}}
-            <div class="w-full flex flex-col md:flex-row md:items-center
-                        justify-start gap-6 md:gap-8 lg:gap-10">
 
-                {{-- =============================================
-                     KOTAK 1: TEKS (judul, deskripsi, tombol)
-                     Tidak diubah dari sebelumnya.
-                ============================================== --}}
-                <div class="w-full max-w-[560px]
-                            bg-[#91a9ba]/85
+                {{-- =================================================
+                     KOTAK TEKS
+                ================================================== --}}
+                <div class="w-[78%] sm:w-full
+                            max-w-[560px]
+                            bg-[#4F6862]/85
                             backdrop-blur-sm
-                            rounded-2xl
+                            rounded-xl sm:rounded-2xl
                             shadow-2xl
-                            p-8 sm:p-10 lg:p-12
+                            p-4 sm:p-8 lg:p-12
                             text-white">
 
-                {{-- Label --}}
-                <span class="hero-anim block
-                             text-sm sm:text-base
-                             font-semibold
-                             tracking-[0.15em]
-                             uppercase
-                             mb-5">
-                    DESIGN INTERIOR
-                </span>
+                    {{-- GARIS GOLD — REVEAL PERTAMA
+                         Dipindah jadi anak PERTAMA supaya nth-child
+                         label/judul/deskripsi/tombol di bawah tetap
+                         memakai urutan delay yang sama seperti semula,
+                         hanya digeser untuk menunggu garis ini selesai.
+                         Warna diganti dari putih -> gold (#B9A56F),
+                         animasi diganti dari fade menjadi "tumbuh"
+                         (scaleX 0 -> 1) dari kiri. --}}
+                    <div class="hero-line-grow
+                                w-10 sm:w-16
+                                h-[2px]
+                                bg-[#B9A56F]
+                                mb-4 sm:mb-6">
+                    </div>
 
 
-                {{-- Garis --}}
-                <div class="hero-anim w-16 h-px bg-white mb-6"></div>
+                    {{-- LABEL --}}
+                    <span class="hero-anim block
+                                 text-[10px] sm:text-base
+                                 font-semibold
+                                 tracking-[0.15em]
+                                 uppercase
+                                 mb-3 sm:mb-5">
+                        DESIGN INTERIOR
+                    </span>
 
 
-                {{-- Judul --}}
-                <h1 class="hero-anim
-                           font-serif
-                           text-4xl sm:text-5xl lg:text-6xl
-                           font-semibold
-                           leading-[1.08]
-                           mb-6
-                           break-words">
-
-                    {{ $settings['hero_title'] ?? 'Mewujudkan Ruang Impian Menjadi Nyata' }}
-
-                </h1>
-
-
-                {{-- Deskripsi --}}
-                <p class="hero-anim
-                          max-w-[480px]
-                          text-base sm:text-lg
-                          text-white/90
-                          leading-relaxed
-                          mb-8">
-
-                    {{ $settings['hero_subtitle'] ?? 'Kami menghadirkan desain interior yang elegan, fungsional, dan berkualitas tinggi untuk rumah, kantor, maupun ruang komersial.' }}
-
-                </p>
-                
-
-                {{-- Tombol --}}
-                <div class="hero-anim flex flex-wrap gap-4">
-
-                    <a
-                        href="#appointment"
-                        class="btn-shine relative
-                               bg-[#f4f0e5]
-                               text-[#718ba0]
+                    {{-- JUDUL --}}
+                    <h1 class="hero-anim
+                               font-serif
+                               text-2xl sm:text-5xl lg:text-6xl
                                font-semibold
-                               text-sm
-                               px-8 py-4
-                               rounded-lg
-                               text-center
-                               transition
-                               hover:bg-white
-                               whitespace-nowrap"
-                    >
-                        KONSULTASI GRATIS
-                    </a>
+                               leading-[1.08]
+                               mb-3 sm:mb-6
+                               break-words">
 
-                    <a
-                        href="#portofolio"
-                        class="border-2 border-white/80
-                               text-white
-                               font-semibold
-                               text-sm
-                               px-8 py-4
-                               rounded-lg
-                               text-center
-                               transition
-                               hover:bg-white/10
-                               whitespace-nowrap"
-                    >
-                        LIHAT PORTOFOLIO
-                    </a>
+                        {{ $settings['hero_title'] ?? 'Mewujudkan Ruang Impian Menjadi Nyata' }}
+
+                    </h1>
+
+
+                    {{-- DESKRIPSI --}}
+                    <p class="hero-anim
+                              max-w-[480px]
+                              text-xs sm:text-lg
+                              text-white/90
+                              leading-relaxed
+                              mb-4 sm:mb-8">
+
+                        {{ $settings['hero_subtitle'] ?? 'Kami menghadirkan desain interior yang elegan, fungsional, dan berkualitas tinggi untuk rumah, kantor, maupun ruang komersial.' }}
+
+                    </p>
+
+
+                    {{-- =================================================
+                         BUTTON
+                    ================================================== --}}
+                    <div class="hero-anim
+                                flex flex-wrap
+                                gap-2 sm:gap-4">
+
+                        {{-- KONSULTASI --}}
+                        <a
+                            href="#kontak"
+                            class="btn-shine relative
+                                   bg-[#EDE7D8]
+                                   text-[#6F7B68]
+                                   font-semibold
+                                   text-[10px] sm:text-sm
+                                   px-3 sm:px-8
+                                   py-2.5 sm:py-4
+                                   rounded-lg
+                                   text-center
+                                   transition
+                                   hover:bg-white
+                                   whitespace-nowrap">
+
+                            KONSULTASI GRATIS
+
+                        </a>
+
+
+                        {{-- PORTOFOLIO --}}
+                        <a
+                            href="#portofolio"
+                            class="border-2
+                                   border-white/80
+                                   text-white
+                                   font-semibold
+                                   text-[10px] sm:text-sm
+                                   px-3 sm:px-8
+                                   py-2.5 sm:py-4
+                                   rounded-lg
+                                   text-center
+                                   transition
+                                   hover:bg-white/10
+                                   whitespace-nowrap">
+
+                            LIHAT PORTFOLIO
+
+                        </a>
+
+                    </div>
 
                 </div>
-
-                </div>
-                {{-- ^ tutup KOTAK 1: TEKS --}}
+                {{-- END KOTAK TEKS --}}
 
 
-                {{-- =============================================
-                     LOGO BUMIYUJI (TANPA KOTAK/BUNGKUS)
-                     =============================================
-                     Gambar logo polos, TIDAK dibungkus kotak/background
-                     apa pun — tidak ada warna latar, border, atau bayangan.
-                     Cuma gambarnya saja, opacity penuh (jelas terlihat),
-                     diletakkan sejajar di samping kotak teks.
-
-                     INI BAGIAN YANG BISA ANDA UBAH-UBAH:
-
-                     1) LEBAR LOGO
-                        ganti "w-40 md:w-48 lg:w-56 xl:w-64" di bawah.
-                        Tingginya menyesuaikan otomatis (object-contain),
-                        jadi proporsi logo tidak akan gepeng/melar.
-
-                     2) FILE GAMBAR LOGO
-                        Kalau file di "public/images/bumiyuji-icon.png"
-                        diganti dengan logo lengkap (ikon + tulisan
-                        "BUMIYUJI LIVING"), sebaiknya lebar (poin 1)
-                        dibuat lebih besar supaya tulisannya tidak
-                        terlalu kecil.
-
-                     3) KAPAN LOGO INI MUNCUL
-                        "hidden lg:flex" = disembunyikan di semua
-                        layar HP & tablet (termasuk tablet lebar/
-                        HP besar sampai ±1023px), baru muncul mulai
-                        ukuran desktop (lg, 1024px ke atas), supaya
-                        gambar BUMIYUJI ini dipastikan tidak pernah
-                        tampil di perangkat mobile. Ganti "lg" jadi
-                        "md" kalau mau logo mulai muncul lebih awal
-                        (mulai tablet, 768px).
-                ============================================== --}}
-             <div class="hidden lg:flex items-center justify-center shrink-0
-            lg:w-96 xl:w-[28rem]">
+                {{-- =================================================
+                     LOGO BUMIYUJI
+                     MOBILE: DI BAWAH KOTAK
+                     DESKTOP: DI SAMPING KOTAK
+                ================================================== --}}
+                <div class="flex
+                            items-center
+                            justify-center
+                            w-28 sm:w-40
+                            lg:w-80
+                            xl:w-96
+                            shrink-0">
 
                     <img
                         src="{{ asset('images/bumiyuji-icon.png') }}"
                         alt="{{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
-                        class="w-full h-auto object-contain"
+                        class="w-full
+                               h-auto
+                               object-contain
+                               drop-shadow-lg"
                     >
 
                 </div>
-                {{-- ^ LOGO tanpa bungkus --}}
+                {{-- END LOGO --}}
 
             </div>
-            {{-- ^ tutup WRAPPER 2 KOTAK --}}
 
         </div>
 
 
-        {{-- Scroll Indicator --}}
+        {{-- =====================================================
+             SCROLL INDICATOR
+        ====================================================== --}}
         <a
             href="#tentang"
             class="absolute bottom-7 left-1/2
                    -translate-x-1/2
-                   hidden sm:flex flex-col
-                   items-center gap-2
-                   text-white/80"
-        >
+                   hidden sm:flex
+                   flex-col
+                   items-center
+                   gap-2
+                   text-white/80">
 
-            <span class="text-[10px] tracking-[0.25em] uppercase">
+            <span class="text-[10px]
+                         tracking-[0.25em]
+                         uppercase">
                 SCROLL
             </span>
 
@@ -1586,14 +2129,15 @@ NAVBAR
                 class="w-4 h-4 animate-bounce"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
+                viewBox="0 0 24 24">
+
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M19 14l-7 7m0 0l-7-7m7 7V3"
                 />
+
             </svg>
 
         </a>
@@ -1603,10 +2147,306 @@ NAVBAR
 </section>
 
 
+
+{{-- =========================================================
+     STUDIO SNAPSHOT
+     Nilai dihitung dari data homepage yang sudah ada.
+========================================================= --}}
+@php
+    $byjPortfolioTotal = is_countable($portfolios ?? null) ? count($portfolios) : 0;
+    $byjServiceTotal = is_countable($services ?? null) ? count($services) : 0;
+    $byjTeamTotal = isset($team) && method_exists($team, 'count') ? $team->count() : 0;
+    $byjPartnerTotal = is_countable($clientPartners ?? null) ? count($clientPartners) : 0;
+@endphp
+
+<section class="relative z-20 -mt-1 bg-brand-cream px-4 sm:px-6 lg:px-8 py-0">
+    <div class="byj-glass mx-auto max-w-6xl -translate-y-8 rounded-[24px] sm:rounded-[28px] px-3 sm:px-6 py-3 sm:py-5">
+        <div class="grid grid-cols-2 md:grid-cols-4">
+            <div class="byj-stat px-4 sm:px-7 py-4 text-center"><strong class="block font-serif text-3xl sm:text-4xl font-semibold text-brand-forest">{{ $byjPortfolioTotal }}</strong><span class="mt-1 block text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-stone-500">Proyek di Portofolio</span></div>
+            <div class="byj-stat px-4 sm:px-7 py-4 text-center"><strong class="block font-serif text-3xl sm:text-4xl font-semibold text-brand-forest">{{ $byjServiceTotal }}</strong><span class="mt-1 block text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-stone-500">Layanan</span></div>
+            <div class="byj-stat px-4 sm:px-7 py-4 text-center"><strong class="block font-serif text-3xl sm:text-4xl font-semibold text-brand-forest">{{ $byjTeamTotal }}</strong><span class="mt-1 block text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-stone-500">Anggota Tim</span></div>
+            <div class="byj-stat px-4 sm:px-7 py-4 text-center"><strong class="block font-serif text-3xl sm:text-4xl font-semibold text-brand-forest">{{ $byjPartnerTotal }}</strong><span class="mt-1 block text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-stone-500">Klien &amp; Mitra</span></div>
+        </div>
+    </div>
+</section>
+
+{{-- =========================================================
+     BUMIYUJI — VALUE + VIDEO SHOWCASE
+     Tambahan baru: tidak menghapus / mengganti fitur section lama.
+========================================================= --}}
+<style>
+    .byj-showcase-card {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .byj-showcase-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(20,30,26,.02) 15%, rgba(20,30,26,.78) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .byj-showcase-card img {
+        transition: transform .8s cubic-bezier(.22,1,.36,1);
+    }
+
+    .byj-showcase-card:hover img {
+        transform: scale(1.07);
+    }
+
+    .byj-video-frame {
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        background: #30483F;
+        box-shadow: 0 24px 60px -28px rgba(48,72,63,.45);
+    }
+
+    .byj-video-frame::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(48,72,63,.05), rgba(48,72,63,.28));
+        pointer-events: none;
+    }
+
+    .byj-video-play {
+        transition: transform .3s ease, box-shadow .3s ease, background-color .3s ease;
+    }
+
+    .byj-video-frame:hover .byj-video-play {
+        transform: scale(1.08);
+        box-shadow: 0 14px 35px rgba(0,0,0,.25);
+    }
+
+    .byj-cta-wave {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .byj-cta-wave::after {
+        content: '';
+        position: absolute;
+        left: -5%;
+        right: -5%;
+        bottom: -72px;
+        height: 130px;
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        background: #F7F1E5;
+        pointer-events: none;
+    }
+
+    .byj-mini-cta {
+        box-shadow: 0 18px 45px -30px rgba(48,72,63,.55);
+    }
+
+    @media (max-width: 640px) {
+        .byj-cta-wave::after {
+            bottom: -54px;
+            height: 95px;
+        }
+    }
+</style>
+
+<section id="keunggulan" class="relative overflow-hidden bg-[#F2EBDD] py-16 sm:py-20 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="reveal text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+            <span class="text-brand-gold font-semibold tracking-[0.2em] text-[10px] sm:text-xs uppercase block mb-3">
+                KENAPA BUMIYUJI
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-forest leading-tight">
+                Lebih dari Sekadar Desain Interior
+            </h2>
+            <div class="divider-grow origin-center w-16 h-[2px] bg-brand-gold mx-auto mt-5" data-divider></div>
+            <p class="mt-5 text-sm sm:text-base text-stone-600 leading-relaxed">
+                Kami menggabungkan estetika, fungsi, kualitas, dan kebutuhan personal untuk menciptakan ruang yang terasa tepat bagi Anda.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-5">
+            @php
+                $byjFallbackFeatures = [
+                    [
+                        'title' => 'Desain Fungsional',
+                        'description' => 'Ruang dirancang agar indah sekaligus nyaman digunakan setiap hari.',
+                        'image_url' => 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=900&q=85',
+                        'icon' => '01',
+                    ],
+                    [
+                        'title' => 'Tim Profesional',
+                        'description' => 'Dikerjakan dengan proses yang terarah dan memperhatikan kebutuhan proyek.',
+                        'image_url' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=85',
+                        'icon' => '02',
+                    ],
+                    [
+                        'title' => 'Material Berkualitas',
+                        'description' => 'Pemilihan material disesuaikan dengan karakter ruang dan kebutuhan penggunaan.',
+                        'image_url' => 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=900&q=85',
+                        'icon' => '03',
+                    ],
+                    [
+                        'title' => 'Custom Sesuai Kebutuhan',
+                        'description' => 'Konsep dapat disesuaikan dengan karakter, kebutuhan, dan gaya ruang Anda.',
+                        'image_url' => 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=85',
+                        'icon' => '04',
+                    ],
+                ];
+
+                $byjFeatures = collect();
+                try {
+                    if (class_exists('App\Models\HomepageFeature') && \Illuminate\Support\Facades\Schema::hasTable('homepage_features')) {
+                        $byjFeatures = \App\Models\HomepageFeature::query()
+                            ->where('is_active', true)
+                            ->orderBy('sort_order')
+                            ->get();
+                    }
+                } catch (\Throwable $e) {
+                    $byjFeatures = collect();
+                }
+
+                if ($byjFeatures->isEmpty()) {
+                    $byjFeatures = collect($byjFallbackFeatures);
+                }
+            @endphp
+
+            @foreach($byjFeatures as $i => $feature)
+                @php
+                    $featureTitle = is_array($feature) ? ($feature['title'] ?? '') : ($feature->title ?? '');
+                    $featureDescription = is_array($feature) ? ($feature['description'] ?? '') : ($feature->description ?? '');
+                    $featureImage = is_array($feature) ? ($feature['image_url'] ?? '') : ($feature->image_url ?? '');
+                    $featureIcon = is_array($feature) ? ($feature['icon'] ?? str_pad($i + 1, 2, '0', STR_PAD_LEFT)) : ($feature->icon ?? str_pad($i + 1, 2, '0', STR_PAD_LEFT));
+                @endphp
+
+                <article class="byj-feature-card reveal bg-brand-forest">
+                    <img
+                        src="{{ $featureImage }}"
+                        alt="{{ $featureTitle }} — Bumiyuji Living"
+                        loading="lazy"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        onerror="this.style.display='none';"
+                    >
+                    <span class="byj-feature-number">{{ $featureIcon }}</span>
+                    <div class="byj-feature-content">
+                        <h3 class="font-serif text-2xl lg:text-3xl font-semibold leading-tight">{{ $featureTitle }}</h3>
+                        <p class="mt-2 max-w-sm text-xs sm:text-sm leading-relaxed text-white/75">{{ $featureDescription }}</p>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- =========================================================
+     VIDEO + BENEFITS
+     Menggunakan field YouTube yang SUDAH ada di $settings.
+     Tidak membutuhkan migration / database baru.
+========================================================= --}}
+@php
+    $byjYoutubeUrl = trim($settings['youtube'] ?? '');
+    $byjYoutubeId = null;
+
+    if ($byjYoutubeUrl && preg_match(
+        '/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/',
+        $byjYoutubeUrl,
+        $byjYoutubeMatch
+    )) {
+        $byjYoutubeId = $byjYoutubeMatch[1];
+    }
+@endphp
+
+<section id="tentang-lebih-dekat" class="py-16 sm:py-20 lg:py-24 bg-brand-cream">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-[.82fr_1.18fr] gap-10 lg:gap-16 items-center">
+
+            <div class="reveal reveal-left">
+                <span class="text-brand-gold font-semibold tracking-[0.2em] text-[10px] sm:text-xs uppercase block mb-3">
+                    CERITA &amp; KARYA KAMI
+                </span>
+                <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-forest leading-tight">
+                    Kenali Proses dan Karya Bumiyuji
+                </h2>
+                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mt-5 mb-6" data-divider></div>
+                <p class="text-stone-600 leading-relaxed mb-7">
+                    Lihat lebih dekat bagaimana ide interior diterjemahkan menjadi ruang yang memiliki karakter, fungsi, dan nilai estetika.
+                </p>
+
+                <div class="space-y-4">
+                    @foreach([
+                        ['icon' => '✓', 'title' => 'Konsep disesuaikan', 'text' => 'Setiap ruang memiliki kebutuhan dan karakter yang berbeda.'],
+                        ['icon' => '✓', 'title' => 'Proses lebih terarah', 'text' => 'Mulai dari konsultasi hingga pengerjaan, setiap tahap dibuat jelas.'],
+                        ['icon' => '✓', 'title' => 'Fokus pada hasil', 'text' => 'Mengutamakan kenyamanan, fungsi, detail, dan kualitas hasil akhir.'],
+                    ] as $item)
+                        <div class="flex items-start gap-3">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-gold/15 text-brand-forest text-xs font-bold">
+                                {{ $item['icon'] }}
+                            </span>
+                            <div>
+                                <h3 class="text-sm font-bold text-brand-forest">{{ $item['title'] }}</h3>
+                                <p class="mt-1 text-xs sm:text-sm text-stone-500 leading-relaxed">{{ $item['text'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="reveal reveal-right">
+                @if($byjYoutubeId)
+                    <div class="byj-video-frame aspect-video">
+                        <iframe
+                            class="absolute inset-0 w-full h-full"
+                            src="https://www.youtube.com/embed/{{ $byjYoutubeId }}?rel=0"
+                            title="Video Bumiyuji Living"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                @else
+                    <a
+                        href="{{ $byjYoutubeUrl ?: '#' }}"
+                        @if($byjYoutubeUrl) target="_blank" rel="noopener noreferrer" @endif
+                        class="byj-video-frame group block aspect-video"
+                    >
+                        <img
+                            src="{{ !empty($setting?->about_image) ? Storage::url($setting->about_image) : 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85' }}"
+                            alt="Karya Bumiyuji Living"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        >
+                        <div class="absolute inset-0 z-10 bg-black/25"></div>
+                        <div class="absolute inset-0 z-20 flex items-center justify-center">
+                            <span class="byj-video-play flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-white/95 text-brand-forest shadow-xl">
+                                <svg class="ml-1 h-7 w-7 sm:h-8 sm:w-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="absolute left-5 bottom-5 z-20 text-white">
+                            <span class="text-[9px] uppercase tracking-[0.2em] text-white/75">VIDEO &amp; KARYA</span>
+                            <p class="mt-1 font-serif text-xl sm:text-2xl font-semibold">Lihat lebih banyak karya kami</p>
+                        </div>
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+</section>
+
+
 {{-- =========================================================
      TENTANG KAMI
 ========================================================= --}}
-<section id="tentang" class="py-16 sm:py-20 bg-white">
+{{-- =========================================================
+     TARGET ANCHOR: TENTANG KAMI
+     Navbar: <a href="#tentang">Tentang Kami</a>
+     href="#tentang" HARUS cocok dengan id="tentang".
+========================================================= --}}
+<section id="tentang" class="py-16 sm:py-20 bg-brand-cream">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -1623,7 +2463,7 @@ NAVBAR
                     {{ $settings['about_title'] ?? 'Mengenal Bumiyuji Living' }}
                 </h2>
 
-                <div class="w-16 h-[2px] bg-brand-gold mb-7"></div>
+                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-7" data-divider></div>
 
                 <p class="text-stone-600 mb-6 leading-relaxed">
                     {{ $settings['about_text'] ?? '' }}
@@ -1709,7 +2549,7 @@ NAVBAR
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
 
                 {{-- Tim --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1742,7 +2582,7 @@ NAVBAR
 
 
                 {{-- Material --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 80ms;">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 80ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1773,7 +2613,7 @@ NAVBAR
 
 
                 {{-- Garansi --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 160ms;">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 160ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1804,7 +2644,7 @@ NAVBAR
 
 
                 {{-- Desain --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-white rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 240ms;">
+                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 240ms;">
 
                     <svg class="w-10 h-10 text-brand-forest shrink-0"
                          fill="none"
@@ -1847,16 +2687,16 @@ NAVBAR
      global maupun section lain di halaman ini.
 ========================================================= --}}
 
-<section id="visi-misi" class="relative overflow-hidden bg-[#F5F5F1] py-20 lg:py-28">
+<section id="visi-misi" class="relative overflow-hidden bg-[#F2EBDD] py-20 lg:py-28">
 
     {{-- Elemen dekoratif halus: garis & lingkaran outline warna emas,
          opacity rendah, position absolute. Section sudah overflow-hidden
          di atas supaya elemen ini TIDAK pernah menyebabkan horizontal
          scroll / overflow halaman. --}}
     <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute -left-16 top-6 h-56 w-56 rounded-full border border-[#B89B72]/20"></div>
-        <div class="absolute -right-20 bottom-0 h-72 w-72 rounded-full border border-[#B89B72]/10"></div>
-        <div class="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#B89B72]/25 to-transparent"></div>
+        <div class="absolute -left-16 top-6 h-56 w-56 rounded-full border border-[#B9A56F]/20"></div>
+        <div class="absolute -right-20 bottom-0 h-72 w-72 rounded-full border border-[#B9A56F]/10"></div>
+        <div class="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#B9A56F]/25 to-transparent"></div>
     </div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -1864,15 +2704,15 @@ NAVBAR
         {{-- Heading (teks tidak diubah, hanya styling & warna) --}}
         <div class="mb-12 text-center lg:mb-16">
 
-            <span class="text-xs font-semibold uppercase tracking-widest text-[#B89B72]">
+            <span class="text-xs font-semibold uppercase tracking-widest text-[#B9A56F]">
                 VISI & MISI
             </span>
 
-            <h2 class="mt-3 font-serif text-3xl font-semibold text-[#24302C] sm:text-4xl lg:text-5xl">
+            <h2 class="mt-3 font-serif text-3xl font-semibold text-[#30483F] sm:text-4xl lg:text-5xl">
                 Arah dan Komitmen Kami
             </h2>
 
-            <div class="mx-auto mt-5 h-[2px] w-16 bg-[#B89B72]"></div>
+            <div class="divider-grow origin-center mx-auto mt-5 h-[2px] w-16 bg-[#B9A56F]" data-divider></div>
 
         </div>
 
@@ -1892,13 +2732,13 @@ NAVBAR
                 data-vm-float="left"
                 style="transition-delay: 0.1s;"
             >
-                <div class="vm-card-inner group relative rounded-[22px] bg-white p-8 shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
+                <div class="vm-card-inner group relative rounded-[22px] bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 p-8 shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
 
                 
 
                     <div class="relative mb-5 flex items-center gap-4">
 
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#B89B72]/10 text-[#B89B72] transition-transform duration-500 ease-out group-hover:scale-110">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#B9A56F]/10 text-[#B9A56F] transition-transform duration-500 ease-out group-hover:scale-110">
                             <svg
                                 class="h-6 w-6"
                                 fill="none"
@@ -1920,16 +2760,16 @@ NAVBAR
                             </svg>
                         </div>
 
-                        <h3 class="font-serif text-2xl font-bold text-[#24302C]">
+                        <h3 class="font-serif text-2xl font-bold text-[#30483F]">
                             Visi
                         </h3>
 
                     </div>
 
-                    <div class="mb-5 h-px w-10 bg-[#B89B72]/40"></div>
+                    <div class="mb-5 h-px w-10 bg-[#B9A56F]/40"></div>
 
                     {{-- Isi Visi: KONTEN TIDAK DIUBAH --}}
-                    <p class="relative text-[#24302C]/80 leading-relaxed">
+                    <p class="relative text-[#30483F]/80 leading-relaxed">
                         {{ $settings['visi'] ?? 'Visi belum tersedia.' }}
                     </p>
 
@@ -1940,8 +2780,9 @@ NAVBAR
 
             {{-- ============================================
                  CARD MISI — animasi masuk dari KANAN
-                 Warna hijau lama (bg-brand-forest) sudah diganti
-                 dengan #6B7C85 sesuai permintaan.
+                 Warna hijau lama (bg-brand-forest) sempat diganti
+                 #6B7C85, sekarang diselaraskan ke #4F6862 (dark teal)
+                 agar senada dengan warna hero card pada gambar referensi.
             ============================================= --}}
             <div
                 class="vm-card vm-reveal-right"
@@ -1949,7 +2790,7 @@ NAVBAR
                 data-vm-float="right"
                 style="transition-delay: 0.25s;"
             >
-                <div class="vm-card-inner group relative rounded-[22px] bg-[#6B7C85] p-8 text-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
+                <div class="vm-card-inner group relative rounded-[22px] bg-[#4F6862] p-8 text-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-xl sm:p-10 lg:p-12">
 
                   
 
@@ -2137,6 +2978,11 @@ NAVBAR
 {{-- =========================================================
      LAYANAN
 ========================================================= --}}
+{{-- =========================================================
+     TARGET ANCHOR: INFORMASI / LAYANAN
+     Navbar: <a href="#layanan">Informasi</a>
+     Jika ingin mengganti nama menu, href tetap bisa #layanan.
+========================================================= --}}
 <section id="layanan" class="py-20 bg-brand-cream">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2191,7 +3037,7 @@ NAVBAR
                 @endphp
 
                 <article
-                    class="reveal group bg-white rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5"
+                    class="reveal group bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5"
                     @if($index > 0)
                         style="transition-delay: {{ min($index * 100, 500) }}ms"
                     @endif
@@ -2211,7 +3057,7 @@ NAVBAR
 
                     <div class="p-6">
 
-                        <h3 class="font-serif font-bold text-xl text-brand-forest mb-2">
+                        <h3 class="title-underline font-serif font-bold text-xl text-brand-forest mb-2">
                             {{ $service->title }}
                         </h3>
 
@@ -2255,19 +3101,19 @@ NAVBAR
         <div class="reveal mx-auto mb-16 max-w-2xl text-center">
 
             <div class="mb-5 flex items-center justify-center gap-4">
-                <span class="h-px w-10 bg-[#c5a880]"></span>
+                <span class="h-px w-10 bg-[#B9A56F]"></span>
 
                 <span
-                    class="text-xs font-medium uppercase tracking-[0.25em] text-[#c5a880]"
+                    class="text-xs font-medium uppercase tracking-[0.25em] text-[#B9A56F]"
                 >
                     Our Team
                 </span>
 
-                <span class="h-px w-10 bg-[#c5a880]"></span>
+                <span class="h-px w-10 bg-[#B9A56F]"></span>
             </div>
 
             <h2
-                class="font-serif text-4xl leading-tight text-[#2c3e35] sm:text-5xl"
+                class="font-serif text-4xl leading-tight text-[#30483F] sm:text-5xl"
             >
                 Meet Our Team
             </h2>
@@ -2319,7 +3165,7 @@ NAVBAR
                             <div
                                 class="absolute inset-0 rounded-full
                                        bg-gradient-to-br
-                                       from-[#c5a880]/40 to-transparent
+                                       from-[#B9A56F]/40 to-transparent
                                        opacity-0 blur-md
                                        transition-opacity duration-500
                                        group-hover:opacity-100"
@@ -2351,7 +3197,9 @@ NAVBAR
 
                                     <div
                                         class="flex h-full w-full items-center
-                                               justify-center bg-[#eee9df]"
+                                               justify-center bg-gradient-to-br
+                                               from-white via-brand-cream
+                                               to-brand-gold/20"
                                     >
                                         <span
                                             class="font-serif text-lg
@@ -2379,7 +3227,7 @@ NAVBAR
                         ================================================== --}}
                         <h3
                             class="team-content font-serif text-base
-                                   leading-snug text-[#2c3e35]
+                                   leading-snug text-[#30483F]
                                    sm:text-lg lg:text-xl"
                         >
                             {{ $member->name }}
@@ -2434,8 +3282,8 @@ NAVBAR
                                                border border-[#dedbd4]
                                                text-[#6d756f]
                                                transition-colors duration-300
-                                               hover:border-[#c5a880]
-                                               hover:bg-[#c5a880]
+                                               hover:border-[#B9A56F]
+                                               hover:bg-[#B9A56F]
                                                hover:text-white
                                                lg:h-9 lg:w-9"
                                     >
@@ -2486,8 +3334,8 @@ NAVBAR
                                                border border-[#dedbd4]
                                                text-[#6d756f]
                                                transition-colors duration-300
-                                               hover:border-[#c5a880]
-                                               hover:bg-[#c5a880]
+                                               hover:border-[#B9A56F]
+                                               hover:bg-[#B9A56F]
                                                hover:text-white
                                                lg:h-9 lg:w-9"
                                     >
@@ -2537,10 +3385,10 @@ NAVBAR
                                px-7 py-2.5
                                text-xs font-medium uppercase
                                tracking-[0.14em]
-                               text-[#2c3e35]
+                               text-[#30483F]
                                transition-all duration-300
-                               hover:border-[#c5a880]
-                               hover:bg-[#c5a880]
+                               hover:border-[#B9A56F]
+                               hover:bg-[#B9A56F]
                                hover:text-white"
                     >
                         Tampilkan lainnya
@@ -2557,7 +3405,7 @@ NAVBAR
                  EMPTY
             ====================================================== --}}
             <div
-                class="border border-[#dedbd4] bg-white
+                class="border border-[#dedbd4] bg-gradient-to-br from-white via-brand-cream to-brand-gold/15
                        px-6 py-12 text-center"
             >
                 <p class="text-sm text-[#6d756f]">
@@ -2852,7 +3700,12 @@ NAVBAR
      (yang juga terang), sehingga antar-section tidak menyatu.
      Warna brand asli tetap sama, hanya opacity yang berubah.
 ===================================================== --}}
-<section id="portofolio" class="py-20 bg-brand-forest/[0.04]">
+{{-- =========================================================
+     TARGET ANCHOR: PORTOFOLIO
+     Navbar: <a href="#portofolio">Portofolio</a>
+     href dan id harus sama-sama "portofolio".
+========================================================= --}}
+<section id="portofolio" class="py-20 bg-brand-cream">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -2952,7 +3805,7 @@ NAVBAR
                              Ubah radius sudut: ganti "rounded-2xl".
                         ====================================================== --}}
                         <article
-                            class="portfolio-item reveal bg-white rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
+                            class="portfolio-item reveal group bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
                             data-category="{{ $p['category'] ?? '' }}"
                             data-portfolio-id="{{ $p['id'] ?? 0 }}"
                         >
@@ -2976,7 +3829,7 @@ NAVBAR
 
                                 <div class="absolute inset-0 bg-brand-forest/0 group-hover:bg-brand-forest/20 transition-colors duration-300 flex items-center justify-center">
 
-                                    <span class="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white text-brand-forest text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-full shadow">
+                                    <span class="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 text-brand-forest text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-full shadow">
                                         Lihat Detail Proyek
                                     </span>
 
@@ -2986,7 +3839,7 @@ NAVBAR
 
                             <div class="p-6">
 
-                                <h3 class="font-serif font-bold text-lg text-brand-forest mb-1">
+                                <h3 class="title-underline font-serif font-bold text-lg text-brand-forest mb-1">
                                     {{ $p['title'] ?? '' }}
                                 </h3>
 
@@ -3158,17 +4011,17 @@ NAVBAR
 ========================================================= --}}
 <style>
     #alur-kerja svg[width="76"] [stroke="black"] {
-        stroke: #2C3E35; /* brand-forest */
+        stroke: #30483F; /* brand-forest */
     }
 
     #alur-kerja svg[width="76"] [fill="black"] {
-        fill: #2C3E35; /* brand-forest */
+        fill: #30483F; /* brand-forest */
     }
 
     #alur-kerja svg[width="46"] [stroke="black"],
     #alur-kerja svg[width="28"] [stroke="black"],
     #alur-kerja svg[width="32"] [stroke="black"] {
-        stroke: #C5A880; /* brand-gold */
+        stroke: #B9A56F; /* brand-gold */
     }
 </style>
 
@@ -3189,7 +4042,7 @@ NAVBAR
                 ALUR KERJA
             </h2>
 
-            <div class="w-[76px] h-[2px] bg-brand-gold mt-2 mx-auto"></div>
+            <div class="divider-grow origin-center w-[76px] h-[2px] bg-brand-gold mt-2 mx-auto" data-divider></div>
         </div>
 
 
@@ -3202,7 +4055,7 @@ NAVBAR
              Ubah radius sudut kartu: ganti "rounded-3xl".
              Ubah padding dalam kartu: ganti "p-6 sm:p-8 lg:p-10".
         ====================================================== --}}
-        <div class="reveal bg-white rounded-3xl border border-brand-forest/10 shadow-sm p-6 sm:p-8 lg:p-10">
+        <div class="reveal bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-3xl border border-brand-forest/10 shadow-sm p-4 sm:p-8 lg:p-10">
 
         {{-- =====================================================
              DESKTOP
@@ -3679,9 +4532,9 @@ NAVBAR
                 {{-- 01 --}}
                 <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
                         {{-- ICON 01 --}}
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <circle cx="29" cy="25" r="8"
                                     stroke="black"
@@ -3733,8 +4586,8 @@ NAVBAR
 
 
                 {{-- Arrow --}}
-                <div class="flex items-center pt-[30px] shrink-0">
-                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none">
+                <div class="flex items-center pt-[24px] sm:pt-[30px] shrink-0">
+                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none" class="h-3 w-5 sm:h-[18px] sm:w-7">
                         <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                         <path
                             d="M30 4L38 11L30 18"
@@ -3750,9 +4603,9 @@ NAVBAR
                 {{-- 02 --}}
                 <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
                         {{-- ICON 02 --}}
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <path
                                 d="M14 48L18 26L40 20L58 27L54 50L32 56L14 48Z"
@@ -3786,8 +4639,8 @@ NAVBAR
 
 
                 {{-- Arrow --}}
-                <div class="flex items-center pt-[30px] shrink-0">
-                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none">
+                <div class="flex items-center pt-[24px] sm:pt-[30px] shrink-0">
+                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none" class="h-3 w-5 sm:h-[18px] sm:w-7">
                         <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                         <path
                             d="M30 4L38 11L30 18"
@@ -3803,9 +4656,9 @@ NAVBAR
                 {{-- 03 --}}
                 <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
                         {{-- ICON 03 --}}
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <path
                                 d="M18 56V22C18 18 21 15 25 15H50C54 15 57 18 57 22V56H18Z"
@@ -3847,8 +4700,8 @@ NAVBAR
 
 
                 {{-- Arrow --}}
-                <div class="flex items-center pt-[30px] shrink-0">
-                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none">
+                <div class="flex items-center pt-[24px] sm:pt-[30px] shrink-0">
+                    <svg width="28" height="18" viewBox="0 0 46 22" fill="none" class="h-3 w-5 sm:h-[18px] sm:w-7">
                         <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                         <path
                             d="M30 4L38 11L30 18"
@@ -3864,9 +4717,9 @@ NAVBAR
                 {{-- 04 --}}
                 <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
                         {{-- ICON 04 --}}
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <path
                                 d="M20 30C23 21 32 16 41 18C48 19 54 24 56 31"
@@ -3921,14 +4774,14 @@ NAVBAR
 
 
             {{-- ================= BARIS 2 ================= --}}
-            <div class="flex items-start justify-center gap-3 sm:gap-8 mt-12">
+            <div class="flex items-start justify-between w-full gap-1 mt-8 sm:mt-12">
 
                 {{-- 05 --}}
-                <div class="flex flex-col items-center text-center w-[85px] sm:w-[110px]">
+                <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
 
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <circle
                                 cx="38"
@@ -3967,8 +4820,8 @@ NAVBAR
 
 
                 {{-- Arrow --}}
-                <div class="flex items-center pt-[30px] shrink-0">
-                    <svg width="32" height="18" viewBox="0 0 46 22" fill="none">
+                <div class="flex items-center pt-[24px] sm:pt-[30px] shrink-0">
+                    <svg width="32" height="18" viewBox="0 0 46 22" fill="none" class="h-3 w-5 sm:h-[18px] sm:w-8">
                         <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                         <path
                             d="M30 4L38 11L30 18"
@@ -3982,11 +4835,11 @@ NAVBAR
 
 
                 {{-- 06 --}}
-                <div class="flex flex-col items-center text-center w-[85px] sm:w-[110px]">
+                <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
 
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <path
                                 d="M21 51L34 38"
@@ -4023,8 +4876,8 @@ NAVBAR
 
 
                 {{-- Arrow --}}
-                <div class="flex items-center pt-[30px] shrink-0">
-                    <svg width="32" height="18" viewBox="0 0 46 22" fill="none">
+                <div class="flex items-center pt-[24px] sm:pt-[30px] shrink-0">
+                    <svg width="32" height="18" viewBox="0 0 46 22" fill="none" class="h-3 w-5 sm:h-[18px] sm:w-8">
                         <path d="M2 11H37" stroke="black" stroke-width="2.5"/>
                         <path
                             d="M30 4L38 11L30 18"
@@ -4038,11 +4891,11 @@ NAVBAR
 
 
                 {{-- 07 --}}
-                <div class="flex flex-col items-center text-center w-[100px] sm:w-[120px]">
+                <div class="flex flex-col items-center text-center flex-1 min-w-0">
 
-                    <div class="h-[82px] flex items-center justify-center">
+                    <div class="h-[56px] sm:h-[82px] flex items-center justify-center">
 
-                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none">
+                        <svg width="76" height="76" viewBox="0 0 76 76" fill="none" class="h-11 w-11 sm:h-16 sm:w-16">
 
                             <rect
                                 x="19"
@@ -4119,7 +4972,7 @@ NAVBAR
      section ini terpisah secara visual dari "Alur Kerja"
      tepat di atasnya.
 ===================================================== --}}
-<section id="testimoni" class="py-20 bg-brand-forest/[0.04]">
+<section id="testimoni" class="py-20 bg-brand-cream">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -4130,7 +4983,7 @@ NAVBAR
                 TESTIMONI
             </h2>
 
-            <div class="w-20 h-[1.5px] bg-brand-gold mx-auto mt-3"></div>
+            <div class="divider-grow origin-center w-20 h-[1.5px] bg-brand-gold mx-auto mt-3" data-divider></div>
 
         </div>
 
@@ -4511,7 +5364,7 @@ NAVBAR
 
                         <span
                             class="inline-flex items-center px-6 py-2 rounded-full
-                                   bg-white text-brand-forest font-semibold text-sm
+                                   bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 text-brand-forest font-semibold text-sm
                                    shadow-sm border border-stone-200/70"
                         >
                             {{ $group['label'] }}
@@ -4543,7 +5396,7 @@ NAVBAR
                                     {{-- Logo Card --}}
                                     <div
                                         class="flex h-24 w-full items-center justify-center
-                                               rounded-lg bg-white
+                                               rounded-lg bg-gradient-to-br from-white via-brand-cream to-brand-gold/15
                                                border border-stone-200/70
                                                p-4 shadow-sm
                                                transition-all duration-300
@@ -4601,7 +5454,7 @@ NAVBAR
 
             {{-- Tidak ada data --}}
             <div
-                class="border border-stone-200 bg-white
+                class="border border-stone-200 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15
                        px-6 py-12 text-center rounded-lg"
             >
 
@@ -4618,10 +5471,71 @@ NAVBAR
 </section>
 
 {{-- =========================================================
+     CINEMATIC CTA — tambahan visual terinspirasi referensi
+========================================================= --}}
+<section class="byj-cta-wave relative bg-[#24332E] py-16 sm:py-20 lg:py-24">
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center text-white pb-8 sm:pb-12">
+        <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.22em] text-[#B9A56F]">
+            SIAP MEMULAI?
+        </span>
+        <h2 class="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight">
+            Konsultasi desain interior dengan Bumiyuji Living
+        </h2>
+        <p class="mx-auto mt-4 max-w-2xl text-sm sm:text-base leading-relaxed text-white/70">
+            Ceritakan kebutuhan ruang Anda. Kami bantu mengembangkan konsep yang sesuai dengan fungsi, karakter, dan kebutuhan proyek.
+        </p>
+        <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <a href="#kontak" class="btn-shine inline-flex items-center gap-2 rounded-full bg-[#EDE7D8] px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-[#30483F] transition-all duration-300 hover:bg-white hover:-translate-y-0.5">
+                Mulai Konsultasi
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+            <a href="#portofolio" class="inline-flex items-center rounded-full border border-white/25 px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10">
+                Lihat Portofolio
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- =========================================================
+     CTA STRIP — tambahan visual terinspirasi referensi
+     Tidak mengubah form / database / fitur lama.
+========================================================= --}}
+<section class="relative z-10 -mb-1 bg-brand-cream px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
+    <div class="byj-mini-cta mx-auto max-w-6xl rounded-full border border-brand-gold/20 bg-white/95 px-4 sm:px-7 py-3 sm:py-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <span class="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/15 text-brand-forest">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h8m-4-4v8m8-4a8 8 0 11-16 0 8 8 0 0116 0z"/>
+                    </svg>
+                </span>
+                <div>
+                    <p class="text-xs sm:text-sm font-semibold text-brand-forest">Butuh solusi untuk ruang Anda?</p>
+                    <p class="text-[10px] sm:text-xs text-stone-500">Mulai dari konsultasi dan diskusikan kebutuhan proyek Anda.</p>
+                </div>
+            </div>
+            <a href="#kontak" class="btn-shine inline-flex shrink-0 items-center gap-2 rounded-full bg-[#8D9070] px-5 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-white hover:bg-[#777A5F] transition-all duration-300 hover:-translate-y-0.5">
+                Konsultasi Sekarang
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- =========================================================
      APPOINTMENT / KONSULTASI
      Form sederhana -> WhatsApp
 ========================================================= --}}
-<section id="kontak" class="py-20 bg-white">
+{{-- =========================================================
+     TARGET ANCHOR: KONTAK / KONSULTASI
+     Navbar: <a href="#kontak">Kontak</a>
+     Tombol CTA juga bisa memakai href="#kontak".
+========================================================= --}}
+<section id="kontak" class="py-20 bg-brand-cream">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -4638,7 +5552,7 @@ NAVBAR
                     Wujudkan Ruang Impian Anda
                 </h2>
 
-                <div class="w-16 h-[2px] bg-brand-gold mb-6"></div>
+                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-6" data-divider></div>
 
                 <p class="text-stone-600 leading-relaxed mb-6">
                     Ceritakan kebutuhan ruang Anda kepada tim Bumiyuji Living.
@@ -4668,7 +5582,7 @@ NAVBAR
 
 
             {{-- Form --}}
-            <div class="reveal reveal-right bg-[#f1f1f1] rounded-2xl p-6 sm:p-8">
+            <div class="form-card reveal reveal-right bg-[#F2EBDD] border border-[#B9A56F]/20 shadow-[0_12px_32px_-16px_rgba(48,72,63,0.25)] rounded-2xl p-6 sm:p-8 transition-shadow duration-500">
 
                 <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-5">
 
@@ -4685,7 +5599,7 @@ NAVBAR
                             id="form-name"
                             type="text"
                             required
-                            class="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
                             placeholder="Nama lengkap"
                         >
 
@@ -4705,7 +5619,7 @@ NAVBAR
                             id="form-phone"
                             type="tel"
                             required
-                            class="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
                             placeholder="08xxxxxxxxxx"
                         >
 
@@ -4724,7 +5638,7 @@ NAVBAR
                         <input
                             id="form-email"
                             type="email"
-                            class="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
                             placeholder="email@contoh.com"
                         >
 
@@ -4744,7 +5658,7 @@ NAVBAR
                             id="form-address"
                             rows="3"
                             required
-                            class="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm outline-none resize-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none resize-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
                             placeholder="Lokasi proyek"
                         ></textarea>
 
@@ -4764,7 +5678,7 @@ NAVBAR
                             id="form-project"
                             rows="4"
                             required
-                            class="w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-sm outline-none resize-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none resize-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
                             placeholder="Ceritakan kebutuhan interior Anda..."
                         ></textarea>
 
@@ -4773,7 +5687,7 @@ NAVBAR
 
                     <button
                         type="submit"
-                        class="btn-shine relative w-full overflow-hidden bg-brand-forest text-white font-semibold text-sm uppercase tracking-wide px-6 py-4 rounded-lg hover:bg-[#385047] transition"
+                        class="btn-shine relative w-full overflow-hidden bg-brand-forest text-white font-semibold text-sm uppercase tracking-wide px-6 py-4 rounded-lg transition-all duration-300 hover:bg-[#4F6862] hover:-translate-y-0.5 hover:shadow-lg"
                     >
                         Kirim Konsultasi via WhatsApp
                     </button>
@@ -4790,7 +5704,7 @@ NAVBAR
                     Informasi Hub Korporat
                 </h3>
 
-                <div class="w-16 h-[2px] bg-brand-gold mb-6"></div>
+                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-6" data-divider></div>
 
                 <div class="space-y-5">
 
@@ -5182,7 +6096,7 @@ NAVBAR
 
                                 @if (!empty($divisi['logo']))
 
-                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-brand-gold/20">
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 border border-brand-gold/20">
                                         <img
                                             src="{{ Storage::url($divisi['logo']) }}"
                                             alt="{{ $divisi['name'] }}"
@@ -5245,6 +6159,23 @@ NAVBAR
 
 </footer>
 
+
+{{-- =========================================================
+     FLOATING WHATSAPP — quick contact
+========================================================= --}}
+<a
+    id="byj-floating-wa"
+    href="https://wa.me/{{ $settings['wa_number'] ?? '6281311114523' }}?text=Halo%20Bumiyuji%20Living%2C%20saya%20ingin%20berkonsultasi%20mengenai%20desain%20interior."
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Hubungi Bumiyuji melalui WhatsApp"
+    class="byj-float-wa fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-[90] flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-[#8D9070] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#777A5F]"
+>
+    <svg class="h-6 w-6 sm:h-7 sm:w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.149.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.001 2C6.478 2 2 6.477 2 12c0 1.9.526 3.68 1.44 5.2L2 22l4.94-1.396A9.95 9.95 0 0012.001 22C17.524 22 22 17.523 22 12S17.524 2 12.001 2zm0 18.2a8.15 8.15 0 01-4.35-1.26l-.312-.19-3.033.858.834-2.958-.202-.318A8.15 8.15 0 013.85 12c0-4.5 3.65-8.15 8.151-8.15 4.5 0 8.15 3.65 8.15 8.15 0 4.501-3.65 8.2-8.15 8.2z"/>
+    </svg>
+</a>
 
 {{-- =========================================================
      BACK TO TOP
@@ -5380,11 +6311,52 @@ NAVBAR
 
     }
 
-    window.addEventListener(
-        'scroll',
-        handleScroll,
-        { passive: true }
-    );
+/* =========================================================
+   HERO PARALLAX
+   Background hero bergerak lebih lambat dari isi halaman saat
+   discroll, hanya aktif ketika section hero terlihat. Tidak
+   mengubah/menghapus animasi "heroZoom" (scale) yang sudah ada
+   di ".hero-bg-zoom" — ini elemen pembungkus terpisah.
+========================================================== */
+
+const heroParallaxEl = document.querySelector('[data-hero-parallax]');
+const heroParallaxSection = document.getElementById('beranda');
+const prefersReducedMotionParallax = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+).matches;
+
+if (heroParallaxEl && heroParallaxSection && !prefersReducedMotionParallax) {
+
+    // Semakin kecil angka ini, semakin "lambat" background bergerak.
+    const heroParallaxSpeed = 0.15;
+
+    function updateHeroParallax() {
+
+        const rect = heroParallaxSection.getBoundingClientRect();
+
+        // Hanya hitung selama section hero masih ada di layar,
+        // supaya tidak boros perhitungan saat sudah discroll jauh.
+        if (rect.bottom > 0 && rect.top < window.innerHeight) {
+
+            const offset = rect.top * -heroParallaxSpeed;
+
+            heroParallaxEl.style.transform =
+                'translate3d(0, ' + offset + 'px, 0)';
+
+        }
+
+    }
+
+    window.addEventListener('scroll', updateHeroParallax, { passive: true });
+    updateHeroParallax();
+
+}
+
+window.addEventListener(
+    'scroll',
+    handleScroll,
+    { passive: true }
+);
 
     handleScroll();
 
@@ -5438,6 +6410,41 @@ window.addEventListener(
 );
 
 updateActiveNavigation();
+
+/* =========================================================
+   SECTION DIVIDER — GROW ON SCROLL
+   Observer terpisah (tidak memakai observer ".reveal" yang
+   sudah ada) khusus untuk garis gold ber-class "divider-grow",
+   supaya tidak mengubah perilaku observer lain yang sudah ada.
+========================================================== */
+
+const growDividers = document.querySelectorAll('[data-divider]');
+
+if (growDividers.length > 0 && 'IntersectionObserver' in window) {
+
+    const dividerObserver = new IntersectionObserver(function (entries, observer) {
+
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('divider-in-view');
+                observer.unobserve(entry.target);
+            }
+        });
+
+    }, { threshold: 0.4 });
+
+    growDividers.forEach(function (divider) {
+        dividerObserver.observe(divider);
+    });
+
+} else {
+
+    // Fallback: browser lama tanpa IntersectionObserver, tampilkan langsung.
+    growDividers.forEach(function (divider) {
+        divider.classList.add('divider-in-view');
+    });
+
+}
 
     /* =========================================================
        SCROLL REVEAL
@@ -6757,6 +7764,23 @@ updateActiveNavigation();
 
     });
 
+
+    /* =========================================================
+       PAGE SCROLL PROGRESS — visual only
+    ========================================================== */
+    (function () {
+        const bar = document.getElementById('byj-scroll-progress');
+        if (!bar) return;
+        const update = function () {
+            const doc = document.documentElement;
+            const max = doc.scrollHeight - doc.clientHeight;
+            const ratio = max > 0 ? (window.scrollY / max) * 100 : 0;
+            bar.style.width = ratio + '%';
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+    })();
 </script>
 
 </body>

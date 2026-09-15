@@ -3,8 +3,10 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
     <div class="mb-8">
-        <p class="text-sm text-stone-500">Ringkasan konten website BumiYuji.</p>
+        <p class="text-sm text-stone-500">Ringkasan konten website BumiYuji. </p>
+        
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
