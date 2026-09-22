@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AffiliatedDivision;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AffiliatedDivisionController extends Controller
@@ -32,7 +33,7 @@ class AffiliatedDivisionController extends Controller
             $validated['logo'] = $request->file('logo')->store('affiliated-divisions', 'public');
         }
 
-        AffiliatedDivision::create($validated);
+        AffiliatedDivision::create($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.affiliated-divisions.index')
@@ -61,7 +62,7 @@ class AffiliatedDivisionController extends Controller
             $validated['logo'] = $request->file('logo')->store('affiliated-divisions', 'public');
         }
 
-        $affiliatedDivision->update($validated);
+        $affiliatedDivision->update($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.affiliated-divisions.index')

@@ -23,6 +23,7 @@
                         <th class="px-4 py-3">Judul</th>
                         <th class="px-4 py-3">Deskripsi</th>
                         <th class="px-4 py-3 w-32">Status</th>
+                        <th class="px-4 py-3">Diubah oleh</th>
                         <th class="px-4 py-3 text-right w-40">Aksi</th>
                     </tr>
                 </thead>
@@ -45,6 +46,10 @@
                                     <span class="inline-flex rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-500">Draft</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-xs text-stone-500">
+                                <p class="font-medium text-stone-600">{{ optional($workflow->updatedBy)->name ?? '—' }}</p>
+                                <p>{{ optional($workflow->updated_at)->diffForHumans() }}</p>
+                            </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.workflows.edit', $workflow) }}" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-[#2C3E35] hover:bg-stone-100">Edit</a>
@@ -58,7 +63,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 py-12 text-center text-sm text-stone-400">
+                            <td colspan="6" class="px-4 py-12 text-center text-sm text-stone-400">
                                 Belum ada alur kerja. <a href="{{ route('admin.workflows.create') }}" class="font-medium text-[#2C3E35] hover:underline">Tambah sekarang</a>
                             </td>
                         </tr>

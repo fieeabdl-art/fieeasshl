@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Workflow;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class WorkflowController extends Controller
@@ -36,7 +37,7 @@ class WorkflowController extends Controller
 
         $validated['is_published'] = $request->boolean('is_published');
 
-        Workflow::create($validated);
+        Workflow::create($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.workflows.index')
@@ -61,7 +62,7 @@ class WorkflowController extends Controller
 
         $validated['is_published'] = $request->boolean('is_published');
 
-        $workflow->update($validated);
+        $workflow->update($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.workflows.index')

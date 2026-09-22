@@ -7,6 +7,13 @@
         <p class="text-sm text-stone-500">Perbarui data klien/mitra.</p>
     </div>
 
+    @if ($clientPartner->updated_at)
+        <div class="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+            Terakhir diubah oleh <span class="font-medium text-stone-800">{{ optional($clientPartner->updatedBy)->name ?? 'tidak diketahui' }}</span>
+            &middot; {{ $clientPartner->updated_at->diffForHumans() }}
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <ul class="list-inside list-disc space-y-1">

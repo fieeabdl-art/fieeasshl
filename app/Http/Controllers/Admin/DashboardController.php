@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faq;
 use App\Models\Portfolio;
 use App\Models\Service;
 use App\Models\Testimonial;
@@ -19,6 +20,8 @@ class DashboardController extends Controller
             'portfolios_published' => Portfolio::query()->where('is_published', true)->count(),
             'testimonials_total' => Testimonial::query()->count(),
             'testimonials_published' => Testimonial::query()->where('is_published', true)->count(),
+            'faqs_total' => Faq::query()->count(),
+            'faqs_published' => Faq::query()->where('is_published', true)->count(),
         ];
 
         return view('admin.dashboard', compact('stats'));

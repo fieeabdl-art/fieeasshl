@@ -8,6 +8,13 @@
         <a href="{{ route('admin.portfolios.phases.index', $portfolio) }}" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-[#2C3E35] hover:bg-stone-100">Detail Progres &rarr;</a>
     </div>
 
+    @if ($portfolio->updated_at)
+        <div class="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+            Terakhir diubah oleh <span class="font-medium text-stone-800">{{ optional($portfolio->updatedBy)->name ?? 'tidak diketahui' }}</span>
+            &middot; {{ $portfolio->updated_at->diffForHumans() }}
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.portfolios.update', $portfolio) }}" enctype="multipart/form-data" class="mx-auto max-w-2xl space-y-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         @csrf
         @method('PUT')

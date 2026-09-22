@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PortfolioPhase extends Model
 {
+    use HasFactory, TracksAdminAuthorship;
+
     /**
      * Fixed progress stages. Every portfolio has exactly these three
      * phases, identified by percentage. No free-form phases are allowed.
@@ -52,6 +56,7 @@ class PortfolioPhase extends Model
         'description',
         'percentage',
         'sort_order',
+        'updated_by',
     ];
 
     protected function casts(): array

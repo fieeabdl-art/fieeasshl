@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdatePortfolioRequest;
 use App\Models\Portfolio;
 use App\Models\PortfolioPhase;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -38,6 +39,7 @@ class PortfolioController extends Controller
         $data['slug'] = $this->uniqueSlug($data['title']);
         $data['is_published'] = $request->boolean('is_published');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('portfolios', 'public');
@@ -58,6 +60,7 @@ class PortfolioController extends Controller
     {
         $categories = PortfolioCategory::cases();
         $portfolio->load('phases.images');
+
         return view('admin.portfolios.edit', compact('portfolio', 'categories'));
 
     }
@@ -67,6 +70,7 @@ class PortfolioController extends Controller
         $data = $request->safe()->except(['image', 'remove_image']);
         $data['is_published'] = $request->boolean('is_published');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         if ($portfolio->title !== $data['title']) {
             $data['slug'] = $this->uniqueSlug($data['title'], $portfolio->id);

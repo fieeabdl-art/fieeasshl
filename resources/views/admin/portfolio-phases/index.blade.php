@@ -45,6 +45,11 @@
                 </p>
 
                 <p class="mt-3 text-xs text-stone-400">{{ $phase->images->count() }} foto galeri</p>
+                @if ($phase->updated_at)
+                    <p class="mt-1 text-xs text-stone-400">
+                        Diubah oleh {{ optional($phase->updatedBy)->name ?? '—' }} &middot; {{ $phase->updated_at->diffForHumans() }}
+                    </p>
+                @endif
 
                 @if ($phase->images->isNotEmpty())
                     <div class="mt-3 grid grid-cols-4 gap-2">

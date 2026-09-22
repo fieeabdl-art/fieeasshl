@@ -5,6 +5,13 @@
 @section('content')
     <div class="mb-6"><a href="{{ route('admin.services.index') }}" class="text-sm text-stone-500 hover:text-stone-700">&larr; Kembali</a></div>
 
+    @if ($service->updated_at)
+        <div class="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+            Terakhir diubah oleh <span class="font-medium text-stone-800">{{ optional($service->updatedBy)->name ?? 'tidak diketahui' }}</span>
+            &middot; {{ $service->updated_at->diffForHumans() }}
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('admin.services.update', $service) }}" enctype="multipart/form-data" class="mx-auto max-w-2xl space-y-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
         @csrf
         @method('PUT')

@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TeamProfile extends Model
 {
+    use HasFactory, TracksAdminAuthorship;
+
     protected $fillable = [
         'name',
         'position',
@@ -14,6 +18,7 @@ class TeamProfile extends Model
         'linkedin',
         'sort_order',
         'is_published',
+        'updated_by',
     ];
 
     protected function casts(): array

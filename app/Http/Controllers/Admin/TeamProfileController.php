@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TeamProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class TeamProfileController extends Controller
@@ -45,7 +46,7 @@ class TeamProfileController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
-        TeamProfile::create($validated);
+        TeamProfile::create($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.team-profiles.index')
@@ -82,7 +83,7 @@ class TeamProfileController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
-        $teamProfile->update($validated);
+        $teamProfile->update($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.team-profiles.index')

@@ -1,42 +1,199 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($settings['site_title'] ?? 'Bumiyuji Living'); ?></title>
-    <!-- Tailwind CSS CDN -->
+
+    @php
+        $siteSetting = \App\Models\Setting::current();
+
+        $faviconUrl = $siteSetting->favicon
+            ? Storage::url($siteSetting->favicon)
+            : null;
+
+        $faviconExtension = $siteSetting->favicon
+            ? strtolower(pathinfo($siteSetting->favicon, PATHINFO_EXTENSION))
+            : null;
+
+        $faviconMime = match ($faviconExtension) {
+            'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon',
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => 'image/png',
+        };
+    @endphp
+
+    {{-- =========================================================
+         TITLE WEBSITE
+    ========================================================== --}}
+    <title>
+        {{ $siteSetting->site_name ?: ($seo['title'] ?? 'Bumiyuji Living') }}
+    </title>
+
+    {{-- =========================================================
+         FAVICON
+    ========================================================== --}}
+    @if ($faviconUrl)
+        <link
+            rel="icon"
+            type="{{ $faviconMime }}"
+            href="{{ $faviconUrl }}?v={{ $siteSetting->updated_at?->timestamp }}"
+        >
+
+        <link
+            rel="shortcut icon"
+            type="{{ $faviconMime }}"
+            href="{{ $faviconUrl }}?v={{ $siteSetting->updated_at?->timestamp }}"
+        >
+    @endif
+
+    {{-- =========================================================
+         SEO
+    ========================================================== --}}
+    <meta
+        name="description"
+        content="{{ $seo['description'] ?? '' }}"
+    >
+
+    <meta name="robots" content="index, follow">
+
+    <link
+        rel="canonical"
+        href="{{ $seo['canonical'] ?? url('/') }}"
+    >
+
+    {{-- =========================================================
+         OPEN GRAPH
+    ========================================================== --}}
+    <meta property="og:type" content="website">
+
+    <meta
+        property="og:site_name"
+        content="{{ $siteSetting->site_name ?: 'Bumiyuji Living' }}"
+    >
+
+    <meta
+        property="og:title"
+        content="{{ $seo['title'] ?? ($siteSetting->site_name ?: 'Bumiyuji Living') }}"
+    >
+
+    <meta
+        property="og:description"
+        content="{{ $seo['description'] ?? '' }}"
+    >
+
+    <meta
+        property="og:url"
+        content="{{ $seo['canonical'] ?? url('/') }}"
+    >
+
+    <meta
+        property="og:image"
+        content="{{ $seo['og_image'] ?? '' }}"
+    >
+
+    <meta property="og:locale" content="id_ID">
+
+    {{-- =========================================================
+         TWITTER CARD
+    ========================================================== --}}
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta
+        name="twitter:title"
+        content="{{ $seo['title'] ?? ($siteSetting->site_name ?: 'Bumiyuji Living') }}"
+    >
+
+    <meta
+        name="twitter:description"
+        content="{{ $seo['description'] ?? '' }}"
+    >
+
+    <meta
+        name="twitter:image"
+        content="{{ $seo['og_image'] ?? '' }}"
+    >
+
+    {{-- =========================================================
+         JSON-LD
+    ========================================================== --}}
+    @if (!empty($jsonLd))
+        <script type="application/ld+json">
+            {!! json_encode(
+                $jsonLd,
+                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            ) !!}
+        </script>
+    @endif
+
+    {{-- =========================================================
+         TAILWIND CSS
+    ========================================================== --}}
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Playfair Display (Luxury Serif) & Plus Jakarta Sans (Modern Sans-serif) -->
+
+    {{-- =========================================================
+         GOOGLE FONTS
+         Manrope + Cormorant Garamond
+    ========================================================== --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    {{-- =========================================================
+         TAILWIND CONFIG
+    ========================================================== --}}
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            forest: '#2C3E35', // Warna Hijau Forest Premium
-                            gold: '#C5A880',   // Warna Champagne Gold Elegan
-                            cream: '#F9F6F0',  // Warna Background Terang Mewah
-                            charcoal: '#1E1E1E'
+                            forest: '#30483F',
+                            gold: '#B9A56F',
+                            cream: '#F7F1E5',
+                            charcoal: '#1E1E1E',
                         }
                     },
+
                     fontFamily: {
-                        serif: ['Playfair Display', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Manrope', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
                     }
                 }
             }
-        }
+        };
     </script>
+
     <style>
         .custom-gradient {
-            background: linear-gradient(135deg, #2C3E35 0%, #15221B 100%);
+            background: linear-gradient(
+                135deg,
+                #30483F 0%,
+                #18251F 100%
+            );
         }
     </style>
+
+    {{-- =========================================================
+         CSS CUSTOM KAMU YANG SUDAH ADA
+         Tetap letakkan di sini sebelum </head>
+    ========================================================== --}}
+
 </head>
+
+<body class="font-sans bg-brand-cream text-brand-charcoal antialiased">
 <body class="font-sans bg-brand-cream text-brand-charcoal antialiased">
 
     <!-- Top Info Bar -->

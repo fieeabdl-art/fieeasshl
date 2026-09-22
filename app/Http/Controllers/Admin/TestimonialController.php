@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreTestimonialRequest;
 use App\Http\Requests\Admin\UpdateTestimonialRequest;
 use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -32,6 +33,7 @@ class TestimonialController extends Controller
         $data = $request->safe()->except(['photo']);
         $data['is_published'] = $request->boolean('is_published');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('testimonials', 'public');
@@ -54,6 +56,7 @@ class TestimonialController extends Controller
         $data = $request->safe()->except(['photo', 'remove_photo']);
         $data['is_published'] = $request->boolean('is_published');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         if ($request->boolean('remove_photo') && $testimonial->photo) {
             Storage::disk('public')->delete($testimonial->photo);

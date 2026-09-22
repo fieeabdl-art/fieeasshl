@@ -1,4 +1,3 @@
-```blade
 {{-- 
     ============================================================
     HALAMAN EDIT ALUR KERJA
@@ -31,6 +30,13 @@
             Perbarui informasi langkah alur kerja.
         </p>
     </div>
+
+    @if ($workflow->updated_at)
+        <div class="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+            Terakhir diubah oleh <span class="font-medium text-stone-800">{{ optional($workflow->updatedBy)->name ?? 'tidak diketahui' }}</span>
+            &middot; {{ $workflow->updated_at->diffForHumans() }}
+        </div>
+    @endif
 
 
     {{-- ========================================================

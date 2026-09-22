@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ClientPartner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -46,7 +47,7 @@ class ClientPartnerController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
-        ClientPartner::create($validated);
+        ClientPartner::create($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.client-partners.index')
@@ -89,7 +90,7 @@ class ClientPartnerController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
-        $clientPartner->update($validated);
+        $clientPartner->update($validated + ['updated_by' => Auth::guard('admin')->id()]);
 
         return redirect()
             ->route('admin.client-partners.index')

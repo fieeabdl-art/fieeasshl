@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreServiceRequest;
 use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -35,6 +36,7 @@ class ServiceController extends Controller
         $data['slug'] = $this->uniqueSlug($slugBase);
         $data['status'] = $request->boolean('status');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('services', 'public');
@@ -57,6 +59,7 @@ class ServiceController extends Controller
         $data = $request->safe()->except(['image', 'remove_image']);
         $data['status'] = $request->boolean('status');
         $data['sort_order'] = $request->integer('sort_order', 0);
+        $data['updated_by'] = Auth::guard('admin')->id();
 
         $slugBase = ! empty($data['slug']) ? $data['slug'] : $data['title'];
         $data['slug'] = $this->uniqueSlug($slugBase, $service->id);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
 use Database\Factories\TestimonialFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,11 +29,14 @@ use Illuminate\Support\Carbon;
     'photo',
     'sort_order',
     'is_published',
+    'updated_by',
 ])]
 class Testimonial extends Model
 {
     /** @use HasFactory<TestimonialFactory> */
     use HasFactory;
+
+    use TracksAdminAuthorship;
 
     /**
      * Get the attributes that should be cast.

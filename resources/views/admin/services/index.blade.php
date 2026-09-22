@@ -18,6 +18,7 @@
                         <th class="px-4 py-3">Slug</th>
                         <th class="px-4 py-3">Urutan</th>
                         <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Diubah oleh</th>
                         <th class="px-4 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -44,6 +45,10 @@
                                     <span class="inline-flex rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-500">Nonaktif</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-xs text-stone-500">
+                                <p class="font-medium text-stone-600">{{ optional($service->updatedBy)->name ?? '—' }}</p>
+                                <p>{{ optional($service->updated_at)->diffForHumans() }}</p>
+                            </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.services.edit', $service) }}" class="rounded-md px-2.5 py-1.5 text-xs font-medium text-[#2C3E35] hover:bg-stone-100">Edit</a>
@@ -57,7 +62,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-12 text-center text-sm text-stone-400">
+                            <td colspan="7" class="px-4 py-12 text-center text-sm text-stone-400">
                                 Belum ada layanan. <a href="{{ route('admin.services.create') }}" class="font-medium text-[#2C3E35] hover:underline">Tambah sekarang</a>
                             </td>
                         </tr>

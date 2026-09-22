@@ -76,6 +76,10 @@
                             Status
                         </th>
 
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Diubah oleh
+                        </th>
+
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                             Aksi
                         </th>
@@ -139,6 +143,12 @@
                                 @endif
                             </td>
 
+                            {{-- Diubah oleh --}}
+                            <td class="whitespace-nowrap px-6 py-4 text-xs text-gray-500">
+                                <p class="font-medium text-gray-600">{{ optional($member->updatedBy)->name ?? '—' }}</p>
+                                <p>{{ optional($member->updated_at)->diffForHumans() }}</p>
+                            </td>
+
                             {{-- Aksi --}}
                             <td class="whitespace-nowrap px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
@@ -174,7 +184,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="7" class="px-6 py-16 text-center">
 
                                 <div class="mx-auto max-w-md">
 

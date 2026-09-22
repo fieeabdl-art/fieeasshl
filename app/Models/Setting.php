@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -9,6 +10,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string|null $logo
+ * @property string|null $favicon
  * @property string|null $site_name
  * @property string|null $hero_title
  * @property string|null $hero_subtitle
@@ -18,6 +20,11 @@ use Illuminate\Support\Carbon;
  * @property string|null $about_vision
  * @property string|null $about_mission
  * @property string|null $about_image
+ * @property string|null $about_video
+ * @property string|null $parent_company_name
+ * @property string|null $parent_company_brand
+ * @property string|null $ecosystem_intro
+ * @property string|null $parent_company_logo
  * @property string|null $contact_whatsapp
  * @property string|null $contact_email
  * @property string|null $contact_address
@@ -34,6 +41,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'logo',
+    'favicon',
     'site_name',
     'hero_title',
     'hero_subtitle',
@@ -43,6 +51,11 @@ use Illuminate\Support\Carbon;
     'about_vision',
     'about_mission',
     'about_image',
+    'about_video',
+    'parent_company_name',
+    'parent_company_brand',
+    'ecosystem_intro',
+    'parent_company_logo',
     'contact_whatsapp',
     'contact_email',
     'contact_address',
@@ -54,9 +67,12 @@ use Illuminate\Support\Carbon;
     'social_links',
     'appointment_whatsapp_number',
     'appointment_message_template',
+    'updated_by',
 ])]
 class Setting extends Model
 {
+    use TracksAdminAuthorship;
+
     /**
      * Get the attributes that should be cast.
      *

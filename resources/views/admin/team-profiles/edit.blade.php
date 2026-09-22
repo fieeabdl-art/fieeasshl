@@ -13,9 +13,19 @@
         </p>
     </div>
 
+    @if ($teamProfile->updated_at)
+        <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+            Terakhir diubah oleh
+            <span class="font-medium text-gray-800">
+                {{ optional($teamProfile->updatedBy)->name ?? 'tidak diketahui' }}
+            </span>
+            &middot; {{ $teamProfile->updated_at->diffForHumans() }}
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
 
-        {{-- Tampilkan error validasi --}}
+        {{-- Error validasi --}}
         @if ($errors->any())
             <div class="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
                 <ul class="list-disc list-inside text-sm text-red-600">
@@ -36,31 +46,77 @@
 
             {{-- Nama --}}
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="name"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     Nama
                 </label>
 
                 <input
                     type="text"
+                    id="name"
                     name="name"
                     value="{{ old('name', $teamProfile->name) }}"
                     required
-                    class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
                 >
             </div>
 
             {{-- Posisi --}}
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="position"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     Posisi
                 </label>
 
                 <input
                     type="text"
+                    id="position"
                     name="position"
                     value="{{ old('position', $teamProfile->position) }}"
-                    class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
                 >
+            </div>
+
+            {{-- Status --}}
+            <div class="mb-5">
+                <label
+                    for="is_published"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                    Status
+                </label>
+
+                <select
+                    id="is_published"
+                    name="is_published"
+                    required
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
+                >
+                    <option
+                        value="1"
+                        {{ old('is_published', $teamProfile->is_published) ? 'selected' : '' }}
+                    >
+                        Published
+                    </option>
+
+                    <option
+                        value="0"
+                        {{ !old('is_published', $teamProfile->is_published) ? 'selected' : '' }}
+                    >
+                        Draft
+                    </option>
+                </select>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    Published akan ditampilkan di website, sedangkan Draft tidak ditampilkan.
+                </p>
             </div>
 
             {{-- Foto lama --}}
@@ -80,12 +136,16 @@
 
             {{-- Foto baru --}}
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="image_path"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     Ganti Foto
                 </label>
 
                 <input
                     type="file"
+                    id="image_path"
                     name="image_path"
                     accept="image/jpeg,image/png,image/webp"
                     class="w-full rounded-lg border border-gray-300 p-2"
@@ -98,74 +158,93 @@
 
             {{-- Instagram --}}
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="instagram"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     Instagram
                 </label>
 
                 <input
                     type="url"
+                    id="instagram"
                     name="instagram"
                     value="{{ old('instagram', $teamProfile->instagram) }}"
                     placeholder="https://instagram.com/username"
-                    class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
                 >
             </div>
 
             {{-- LinkedIn --}}
             <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="linkedin"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     LinkedIn
                 </label>
 
                 <input
                     type="url"
+                    id="linkedin"
                     name="linkedin"
                     value="{{ old('linkedin', $teamProfile->linkedin) }}"
                     placeholder="https://linkedin.com/in/username"
-                    class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
                 >
             </div>
 
             {{-- Urutan --}}
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                    for="sort_order"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                >
                     Urutan Tampilan
                 </label>
 
                 <input
                     type="number"
+                    id="sort_order"
                     name="sort_order"
                     value="{{ old('sort_order', $teamProfile->sort_order ?? 0) }}"
                     min="0"
-                    class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    class="w-full rounded-lg border-gray-300
+                           focus:border-indigo-500 focus:ring-indigo-500"
                 >
             </div>
 
             {{-- Tombol --}}
-    
-{{-- Tombol --}}
-<div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
 
-    {{-- Tombol Batal --}}
-    <a
-        href="{{ route('admin.team-profiles.index') }}"
-        class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg
-               bg-gray-100 text-gray-700 font-semibold
-               border border-gray-300
-               hover:bg-gray-200
-               transition-all duration-200"
-    >
-        Batal
-    </a>
+                {{-- Batal --}}
+                <a
+                    href="{{ route('admin.team-profiles.index') }}"
+                    class="inline-flex items-center justify-center
+                           px-5 py-2.5 rounded-lg
+                           bg-gray-100 text-gray-700 font-semibold
+                           border border-gray-300
+                           hover:bg-gray-200
+                           transition-all duration-200"
+                >
+                    Batal
+                </a>
 
-    {{-- Tombol Simpan Perubahan --}}
-     <button
-                type="submit"
-                class="rounded-lg bg-[#2C3E35] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#24332c]"
-            >
-                Update
-            </button>
+                {{-- Update --}}
+                <button
+                    type="submit"
+                    class="rounded-lg bg-[#2C3E35]
+                           px-5 py-2.5
+                           text-sm font-semibold text-white
+                           shadow-sm
+                           transition hover:bg-[#24332c]"
+                >
+                    Update
+                </button>
 
+            </div>
 
         </form>
 

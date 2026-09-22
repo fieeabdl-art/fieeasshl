@@ -4,7 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $settings['site_title'] ?? 'Bumiyuji Living' }}</title>
+    <title>{{ $seo['title'] ?? ($settings['site_title'] ?? 'Bumiyuji Living') }}</title>
+
+    {{-- =========================================================
+         FAVICON
+         Dibaca langsung dari Setting::current() (variabel $setting,
+         dikirim dari routes/web.php). Kalau belum ada favicon yang
+         diupload lewat CMS, tidak ada tag <link> sama sekali, dan
+         browser otomatis fallback ke public/favicon.ico / .svg.
+    ========================================================== --}}
+    @php
+        $faviconUrl = $setting->favicon ? Storage::url($setting->favicon) : null;
+        $faviconExtension = $setting->favicon
+            ? strtolower(pathinfo($setting->favicon, PATHINFO_EXTENSION))
+            : null;
+        $faviconMime = match ($faviconExtension) {
+            'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon',
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => 'image/png',
+        };
+    @endphp
+
+    @if ($faviconUrl)
+        <link rel="icon" type="{{ $faviconMime }}" href="{{ $faviconUrl }}?v={{ $setting->updated_at?->timestamp }}">
+        <link rel="shortcut icon" type="{{ $faviconMime }}" href="{{ $faviconUrl }}?v={{ $setting->updated_at?->timestamp }}">
+    @endif
+
+    {{-- =========================================================
+         SEO — meta description, canonical, robots
+         $seo dikirim dari routes/web.php, beda isi per section URL,
+         tapi canonical SELALU ke "/" biar tidak dianggap duplicate
+         content oleh Google (semua route render view yang sama).
+    ========================================================== --}}
+    <meta name="description" content="{{ $seo['description'] ?? '' }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ $seo['canonical'] ?? url('/') }}">
+
+    {{-- =========================================================
+         OPEN GRAPH — preview link di WhatsApp/Facebook/Instagram
+    ========================================================== --}}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $settings['site_title'] ?? 'Bumiyuji Living' }}">
+    <meta property="og:title" content="{{ $seo['title'] ?? ($settings['site_title'] ?? 'Bumiyuji Living') }}">
+    <meta property="og:description" content="{{ $seo['description'] ?? '' }}">
+    <meta property="og:url" content="{{ $seo['canonical'] ?? url('/') }}">
+    <meta property="og:image" content="{{ $seo['og_image'] ?? '' }}">
+    <meta property="og:locale" content="id_ID">
+
+    {{-- =========================================================
+         TWITTER CARD
+    ========================================================== --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seo['title'] ?? '' }}">
+    <meta name="twitter:description" content="{{ $seo['description'] ?? '' }}">
+    <meta name="twitter:image" content="{{ $seo['og_image'] ?? '' }}">
+
+    {{-- =========================================================
+         JSON-LD — LocalBusiness structured data
+         Bantu Google paham ini bisnis lokal: alamat, kontak, jam
+         operasional, link sosial media. Berguna untuk local pack /
+         Google Maps, bukan cuma organic search biasa.
+    ========================================================== --}}
+    @if (!empty($jsonLd))
+        <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endif
 
     {{-- =========================================================
          TAILWIND CSS
@@ -160,8 +226,12 @@
                 transition: none;
             }
 
-            .hero-bg-zoom {
-                animation: none !important;
+            .hero-slide-zoom {
+                transition: none !important;
+            }
+
+            .hero-slide {
+                transition: none !important;
             }
 
             .hero-parallax {
@@ -236,6 +306,68 @@
 
         .hero-bg-zoom {
             animation: heroZoom 18s ease-in-out infinite alternate;
+        }
+
+        /* =====================================================
+           HERO SLIDES (multi-image)
+           Setiap ".hero-slide" adalah satu layer penuh (stacked,
+           position absolute). JS ("hero slider driver" di bawah)
+           menambah/menghapus class "is-active" / "is-bridging"
+           secara bergantian setiap ~4 detik untuk mengatur crossfade
+           + blur singkat sebagai jembatan antar slide.
+
+           - opacity & filter (blur) dianimasikan di ".hero-slide"
+             (outer layer) via transition, dipicu oleh JS.
+           - scale (zoom out) dianimasikan terpisah di
+             ".hero-slide-zoom" (inner layer) supaya "filter: blur()"
+             pada outer layer tidak mengganggu performa transform
+             zoom yang berjalan sepanjang 4 detik.
+
+           Jika hanya ada 1 gambar, JS tidak akan mengganti slide
+           (lihat "slides.length <= 1" di script "HERO SLIDER" di
+           bawah), sehingga slide tunggal itu tetap diam di
+           "is-active" tanpa autoplay, sesuai spesifikasi.
+        ====================================================== */
+
+        .hero-slide {
+            opacity: 0;
+            filter: blur(0);
+            transition:
+                opacity var(--hero-bridge-ms, 450ms) ease,
+                filter var(--hero-bridge-ms, 450ms) ease;
+            will-change: opacity, filter;
+        }
+
+        .hero-slide.is-active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .hero-slide.is-bridging {
+            /* Blur singkat sebagai JEMBATAN antar slide — bukan
+               sepanjang 4 detik, hanya selama transisi berlangsung. */
+            filter: blur(6px);
+            z-index: 2;
+        }
+
+        .hero-slide-zoom {
+            width: 100%;
+            height: 100%;
+            transform: scale(1.08);
+            transition: transform var(--hero-display-ms, 4000ms) linear;
+        }
+
+        .hero-slide.is-active .hero-slide-zoom {
+            /* Zoom out perlahan: scale 1.08 -> 1.00 selama ±4 detik,
+               berjalan otomatis begitu ".is-active" ditambahkan. */
+            transform: scale(1.0);
+        }
+
+        .hero-slide-zoom.no-zoom-transition {
+            /* Dipakai sesaat oleh JS untuk mengembalikan slide yang baru
+               saja keluar ke scale awal (1.08) TANPA transisi, supaya
+               siap di-zoom lagi di putaran berikutnya. */
+            transition: none !important;
         }
 
         /* =====================================================
@@ -724,17 +856,18 @@
 }
 
 /* =====================================================
-   PANAH TESTIMONI - DI LUAR CARD
+   PANAH TESTIMONI - DI DALAM CARD, TRANSPARAN
+   (menyatu dengan foto, seperti badge counter)
 ===================================================== */
 
 .testimonial-navigation {
     position: absolute;
 
     top: 50%;
-    left: -75px;
-    right: -75px;
+    left: 16px;
+    right: 16px;
 
-    z-index: 100;
+    z-index: 20;
 
     display: flex;
     align-items: center;
@@ -747,8 +880,8 @@
 
 .testimonial-prev,
 .testimonial-next {
-    width: 52px;
-    height: 52px;
+    width: 40px;
+    height: 40px;
 
     padding: 0;
 
@@ -758,11 +891,11 @@
 
     border-radius: 50%;
 
-    background: #ffffff !important;
+    background: rgba(255, 255, 255, .16) !important;
 
-    border: 1px solid #d6d3d1 !important;
+    border: 1px solid rgba(255, 255, 255, .35) !important;
 
-    color: #111111 !important;
+    color: #ffffff !important;
 
     opacity: 1 !important;
     visibility: visible !important;
@@ -771,7 +904,10 @@
 
     cursor: pointer;
 
-    box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
 
     transition:
         transform .25s ease,
@@ -780,84 +916,28 @@
 }
 
 .testimonial-prev:hover {
-    transform: translateX(-4px);
-}
-
-.testimonial-next:hover {
-    transform: translateX(4px);
-}
-
-.testimonial-prev:hover,
-.testimonial-next:hover {
-    background: #f5f5f5 !important;
-
-    box-shadow: 0 8px 25px rgba(0, 0, 0, .20);
-}
-
-.testimonial-prev svg,
-.testimonial-next svg {
-    width: 24px;
-    height: 24px;
-
-    display: block;
-
-    stroke: currentColor;
-}
-
-
-/* =====================================================
-   TABLET
-===================================================== */
-
-@media (max-width: 1280px) {
-
-    .testimonial-navigation {
-        left: 15px;
-        right: 15px;
-    }
-
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 640px) {
-
-    .testimonial-navigation {
-        left: 10px;
-        right: 10px;
-    }
-
-    .testimonial-prev,
-    .testimonial-next {
-        width: 42px;
-        height: 42px;
-    }
-
-    .testimonial-prev svg,
-    .testimonial-next svg {
-        width: 20px;
-        height: 20px;
-    }
-
-}
-
-.testimonial-prev:hover,
-.testimonial-next:hover {
-    background: #f7f7f7;
-
-    box-shadow:
-        0 12px 30px rgba(0, 0, 0, .16);
-}
-
-.testimonial-prev:hover {
     transform: translateX(-3px);
 }
 
 .testimonial-next:hover {
     transform: translateX(3px);
+}
+
+.testimonial-prev:hover,
+.testimonial-next:hover {
+    background: rgba(255, 255, 255, .30) !important;
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+}
+
+.testimonial-prev svg,
+.testimonial-next svg {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+
+    stroke: currentColor;
 }
 
 /* =====================================================
@@ -907,16 +987,8 @@
 @media (max-width: 1280px) {
 
     .testimonial-navigation {
-        left: 18px;
-        right: 18px;
-    }
-
-    .testimonial-prev,
-    .testimonial-next {
-        background: rgba(255, 255, 255, .90);
-
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        left: 14px;
+        right: 14px;
     }
 }
 
@@ -963,14 +1035,20 @@
     }
 
     .testimonial-navigation {
-        left: 12px;
-        right: 12px;
+        left: 10px;
+        right: 10px;
     }
 
     .testimonial-prev,
     .testimonial-next {
-        width: 42px;
-        height: 42px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .testimonial-prev svg,
+    .testimonial-next svg {
+        width: 16px;
+        height: 16px;
     }
 
     .testimonial-counter {
@@ -1010,17 +1088,19 @@
 
 
         /* =========================================================
-           PORTFOLIO CAROUSEL (INFINITE MARQUEE)
+           PORTFOLIO CAROUSEL (INFINITE MARQUEE + PANAH MANUAL)
            Hanya mempengaruhi bagian Portofolio.
 
-           Catatan penting:
-           - Posisi track (#portfolio-grid) TIDAK lagi digerakkan
-             lewat CSS "transition", tapi lewat JavaScript
-             (requestAnimationFrame) setiap frame, supaya kecepatan
-             gesernya benar-benar konstan dan tidak pernah terlihat
-             "loncat" balik ke kartu pertama.
-           - Karena itu, jangan menambahkan properti "transition"
-             untuk transform di sini lagi. Biarkan JS yang mengatur.
+           Sama seperti marquee "Klien & Mitra": track bergeser
+           terus-menerus TANPA jeda/berhenti dan loop-nya menyambung
+           mulus. Bedanya:
+           - Kecepatan dibuat sedikit lebih lambat daripada marquee
+             Klien & Mitra.
+           - Ada tombol panah kiri/kanan untuk menggeser manual satu
+             kartu; geser otomatis tetap lanjut setelahnya.
+           Posisi track digerakkan lewat JavaScript (requestAnimationFrame)
+           setiap frame supaya kecepatannya konstan dan tombol panah
+           bisa "menumpangi" posisi yang sama.
         ========================================================== */
 
         .portfolio-carousel {
@@ -1032,23 +1112,25 @@
             position: relative;
             width: 100%;
             overflow: hidden;
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
         }
 
         #portfolio-grid.portfolio-grid {
             display: flex !important;
             flex-wrap: nowrap !important;
-            gap: 24px;
-            width: 100%;
+            align-items: stretch;
+            gap: 16px;
+            width: max-content;
             margin: 0;
             padding: 4px 2px 8px;
-            /* Posisi awal transform, akan terus diperbarui oleh JS */
             transform: translate3d(0, 0, 0);
             will-change: transform;
         }
 
         #portfolio-grid.portfolio-grid .portfolio-item {
-            flex: 0 0 calc((100% - 48px) / 3);
-            width: calc((100% - 48px) / 3);
+            flex: 0 0 auto;
+            width: 280px;
             min-width: 0;
             margin: 0;
         }
@@ -1105,11 +1187,6 @@
             outline-offset: 3px;
         }
 
-        .portfolio-arrow.disabled {
-            opacity: .25;
-            pointer-events: none;
-        }
-
         .portfolio-arrow-left {
             left: -22px;
         }
@@ -1118,37 +1195,7 @@
             right: -22px;
         }
 
-        @media (max-width: 1024px) {
-            #portfolio-grid.portfolio-grid {
-                gap: 24px;
-            }
-
-            #portfolio-grid.portfolio-grid .portfolio-item {
-                flex-basis: calc((100% - 24px) / 2);
-                width: calc((100% - 24px) / 2);
-            }
-
-            .portfolio-arrow-left {
-                left: -12px;
-            }
-
-            .portfolio-arrow-right {
-                right: -12px;
-            }
-        }
-
         @media (max-width: 640px) {
-            #portfolio-grid.portfolio-grid {
-                gap: 16px;
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            #portfolio-grid.portfolio-grid .portfolio-item {
-                flex-basis: 100%;
-                width: 100%;
-            }
-
             .portfolio-arrow {
                 width: 38px;
                 height: 38px;
@@ -1168,11 +1215,26 @@
             }
         }
 
+        @media (min-width: 640px) {
+            #portfolio-grid.portfolio-grid {
+                gap: 24px;
+            }
+
+            #portfolio-grid.portfolio-grid .portfolio-item {
+                width: 320px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #portfolio-grid.portfolio-grid .portfolio-item {
+                width: 360px;
+            }
+        }
+
         /*
          * Untuk pengguna yang mengaktifkan "reduce motion" di OS
-         * mereka, JS akan mematikan gerakan otomatis (lihat
-         * portfolioReducedMotion). Rule di bawah ini hanya jaga-jaga
-         * supaya tidak ada transisi CSS lain yang tiba-tiba aktif.
+         * mereka, JS akan mematikan gerakan otomatis (tombol panah
+         * tetap berfungsi untuk menggeser manual).
          */
         @media (prefers-reduced-motion: reduce) {
             #portfolio-grid.portfolio-grid {
@@ -1405,12 +1467,7 @@
 
             {{-- =====================================================
                  LINK NAVBAR: BERANDA
-                 href="#beranda" -> menuju {{-- =========================================================
-     TARGET ANCHOR: BERANDA
-     Navbar: <a href="#beranda">Beranda</a>
-     Menu tersebut akan scroll langsung ke section ini.
-========================================================= --}}
-<section id="beranda">
+                 href="#beranda" -> menuju target anchor id="beranda"
                  Jika ingin mengubah tujuan menu Beranda, ubah href-nya.
             ====================================================== --}}
             {{-- BERANDA --}}
@@ -1892,259 +1949,7 @@
 {{-- =========================================================
      HERO
 ========================================================= --}}
-<section id="beranda"
-         class="relative bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 overflow-hidden px-2 sm:px-3 lg:px-4 py-0">
-
-    <div class="relative w-full
-                h-[680px] sm:h-[720px] lg:h-[760px]
-                rounded-[28px] overflow-hidden">
-
-        {{-- =====================================================
-             HERO PARALLAX WRAPPER
-             Div pembungkus baru HANYA untuk efek parallax (background
-             bergerak sedikit lebih lambat saat discroll). Logic gambar
-             (Storage::url / asset) di dalam @if/@else TIDAK diubah.
-             Kecepatan parallax diatur di variabel JS "heroParallaxSpeed".
-        ====================================================== --}}
-        <div class="hero-parallax absolute inset-0 overflow-hidden" data-hero-parallax>
-
-        {{-- BACKGROUND HERO --}}
-        @if($setting?->hero_image)
-
-            <div
-                class="hero-bg-zoom absolute inset-0 bg-cover bg-center"
-                style="background-image: url('{{ Storage::url($setting->hero_image) }}');">
-            </div>
-
-        @else
-
-            <div
-                class="hero-bg-zoom absolute inset-0 bg-cover bg-center"
-                style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1800&q=90');">
-            </div>
-
-        @endif
-
-        </div>
-        {{-- END HERO PARALLAX WRAPPER --}}
-
-
-
-        {{-- OVERLAY --}}
-        <div class="absolute inset-0 bg-black/10"></div>
-
-        {{-- DEPTH GRADIENT --}}
-        <div class="pointer-events-none absolute inset-x-0 bottom-0
-                    h-40 bg-gradient-to-t
-                    from-black/25 to-transparent">
-        </div>
-
-
-        {{-- =====================================================
-             HERO CONTENT
-        ====================================================== --}}
-        <div class="relative h-full flex items-center
-                    justify-center
-                    px-2 sm:px-6 lg:px-12">
-
-            <div class="w-full
-                        flex flex-col
-                        items-center
-                        lg:flex-row
-                        lg:items-center
-                        lg:justify-start
-                        gap-2 sm:gap-6 lg:gap-10">
-
-
-                {{-- =================================================
-                     KOTAK TEKS
-                ================================================== --}}
-                <div class="w-[78%] sm:w-full
-                            max-w-[560px]
-                            bg-[#4F6862]/85
-                            backdrop-blur-sm
-                            rounded-xl sm:rounded-2xl
-                            shadow-2xl
-                            p-4 sm:p-8 lg:p-12
-                            text-white">
-
-                    {{-- GARIS GOLD — REVEAL PERTAMA
-                         Dipindah jadi anak PERTAMA supaya nth-child
-                         label/judul/deskripsi/tombol di bawah tetap
-                         memakai urutan delay yang sama seperti semula,
-                         hanya digeser untuk menunggu garis ini selesai.
-                         Warna diganti dari putih -> gold (#B9A56F),
-                         animasi diganti dari fade menjadi "tumbuh"
-                         (scaleX 0 -> 1) dari kiri. --}}
-                    <div class="hero-line-grow
-                                w-10 sm:w-16
-                                h-[2px]
-                                bg-[#B9A56F]
-                                mb-4 sm:mb-6">
-                    </div>
-
-
-                    {{-- LABEL --}}
-                    <span class="hero-anim block
-                                 text-[10px] sm:text-base
-                                 font-semibold
-                                 tracking-[0.15em]
-                                 uppercase
-                                 mb-3 sm:mb-5">
-                        DESIGN INTERIOR
-                    </span>
-
-
-                    {{-- JUDUL --}}
-                    <h1 class="hero-anim
-                               font-serif
-                               text-2xl sm:text-5xl lg:text-6xl
-                               font-semibold
-                               leading-[1.08]
-                               mb-3 sm:mb-6
-                               break-words">
-
-                        {{ $settings['hero_title'] ?? 'Mewujudkan Ruang Impian Menjadi Nyata' }}
-
-                    </h1>
-
-
-                    {{-- DESKRIPSI --}}
-                    <p class="hero-anim
-                              max-w-[480px]
-                              text-xs sm:text-lg
-                              text-white/90
-                              leading-relaxed
-                              mb-4 sm:mb-8">
-
-                        {{ $settings['hero_subtitle'] ?? 'Kami menghadirkan desain interior yang elegan, fungsional, dan berkualitas tinggi untuk rumah, kantor, maupun ruang komersial.' }}
-
-                    </p>
-
-
-                    {{-- =================================================
-                         BUTTON
-                    ================================================== --}}
-                    <div class="hero-anim
-                                flex flex-wrap
-                                gap-2 sm:gap-4">
-
-                        {{-- KONSULTASI --}}
-                        <a
-                            href="#kontak"
-                            class="btn-shine relative
-                                   bg-[#EDE7D8]
-                                   text-[#6F7B68]
-                                   font-semibold
-                                   text-[10px] sm:text-sm
-                                   px-3 sm:px-8
-                                   py-2.5 sm:py-4
-                                   rounded-lg
-                                   text-center
-                                   transition
-                                   hover:bg-white
-                                   whitespace-nowrap">
-
-                            KONSULTASI GRATIS
-
-                        </a>
-
-
-                        {{-- PORTOFOLIO --}}
-                        <a
-                            href="#portofolio"
-                            class="border-2
-                                   border-white/80
-                                   text-white
-                                   font-semibold
-                                   text-[10px] sm:text-sm
-                                   px-3 sm:px-8
-                                   py-2.5 sm:py-4
-                                   rounded-lg
-                                   text-center
-                                   transition
-                                   hover:bg-white/10
-                                   whitespace-nowrap">
-
-                            LIHAT PORTFOLIO
-
-                        </a>
-
-                    </div>
-
-                </div>
-                {{-- END KOTAK TEKS --}}
-
-
-                {{-- =================================================
-                     LOGO BUMIYUJI
-                     MOBILE: DI BAWAH KOTAK
-                     DESKTOP: DI SAMPING KOTAK
-                ================================================== --}}
-                <div class="flex
-                            items-center
-                            justify-center
-                            w-28 sm:w-40
-                            lg:w-80
-                            xl:w-96
-                            shrink-0">
-
-                    <img
-                        src="{{ asset('images/bumiyuji-icon.png') }}"
-                        alt="{{ $settings['site_title'] ?? 'Bumiyuji Living' }}"
-                        class="w-full
-                               h-auto
-                               object-contain
-                               drop-shadow-lg"
-                    >
-
-                </div>
-                {{-- END LOGO --}}
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-             SCROLL INDICATOR
-        ====================================================== --}}
-        <a
-            href="#tentang"
-            class="absolute bottom-7 left-1/2
-                   -translate-x-1/2
-                   hidden sm:flex
-                   flex-col
-                   items-center
-                   gap-2
-                   text-white/80">
-
-            <span class="text-[10px]
-                         tracking-[0.25em]
-                         uppercase">
-                SCROLL
-            </span>
-
-            <svg
-                class="w-4 h-4 animate-bounce"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
-
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-
-            </svg>
-
-        </a>
-
-    </div>
-
-</section>
+@include('partials.landing.beranda')
 
 
 
@@ -2395,7 +2200,23 @@
             </div>
 
             <div class="reveal reveal-right">
-                @if($byjYoutubeId)
+                @if(!empty($setting?->about_video))
+                    <div class="byj-video-frame aspect-video">
+                        <video
+                            class="absolute inset-0 w-full h-full object-cover"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            controls
+                            preload="auto"
+                            @if(!empty($setting?->about_image)) poster="{{ Storage::url($setting->about_image) }}" @endif
+                        >
+                            <source src="{{ Storage::url($setting->about_video) }}" type="video/mp4">
+                            Browser Anda tidak mendukung pemutaran video ini.
+                        </video>
+                    </div>
+                @elseif($byjYoutubeId)
                     <div class="byj-video-frame aspect-video">
                         <iframe
                             class="absolute inset-0 w-full h-full"
@@ -2446,240 +2267,7 @@
      Navbar: <a href="#tentang">Tentang Kami</a>
      href="#tentang" HARUS cocok dengan id="tentang".
 ========================================================= --}}
-<section id="tentang" class="py-16 sm:py-20 bg-brand-cream">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-            {{-- Text --}}
-            <div class="reveal reveal-left">
-
-                <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase block mb-4">
-                    TENTANG KAMI
-                </span>
-
-                <h2 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal text-brand-forest mb-6 leading-[1.08]">
-                    {{ $settings['about_title'] ?? 'Mengenal Bumiyuji Living' }}
-                </h2>
-
-                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-7" data-divider></div>
-
-                <p class="text-stone-600 mb-6 leading-relaxed">
-                    {{ $settings['about_text'] ?? '' }}
-                </p>
-
-                <p class="text-stone-600 mb-8 leading-relaxed font-light">
-                    {{ $settings['about_subtext'] ?? '' }}
-                </p>
-
-                <a
-                    href="#kontak"
-                    class="inline-flex items-center gap-3
-                           border border-brand-forest
-                           text-brand-forest
-                           px-5 py-2.5
-                           rounded-full
-                           text-sm font-medium
-                           hover:bg-brand-forest
-                           hover:text-white
-                           transition duration-300"
-                >
-
-                    About Us
-
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                        />
-                    </svg>
-
-                </a>
-
-            </div>
-
-
-            {{-- Image --}}
-            <div class="relative reveal reveal-right flex justify-center lg:justify-end">
-
-                <div class="relative w-full max-w-[520px]">
-
-                    <img
-                        src="{{ !empty($setting?->about_image)
-                            ? Storage::url($setting->about_image)
-                            : 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80' }}"
-                        alt="Bumiyuji Living"
-                        loading="lazy"
-                        class="relative z-10 w-full h-[400px] sm:h-[450px] lg:h-[500px] object-contain"
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =====================================================
-         4 KEUNGGULAN
-         Diubah dari baris ikon polos jadi kartu individual
-         (background putih + border + shadow tipis) supaya
-         punya hierarchy dan tidak terlihat seperti teks biasa.
-
-         Cara mengubah jumlah kolom:
-         ganti "md:grid-cols-4" di bawah.
-
-         Cara mengubah jarak antar kartu:
-         ganti "gap-4 sm:gap-5" di bawah.
-    ====================================================== --}}
-    <div class="mt-16 bg-brand-gold/[0.06] py-10 sm:py-12">
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
-
-                {{-- Tim --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-
-                    <svg class="w-10 h-10 text-brand-forest shrink-0"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
-                        />
-
-                        <circle cx="9" cy="7" r="4" stroke-width="1.5"/>
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
-                        />
-
-                    </svg>
-
-                    <span class="text-sm text-brand-forest leading-tight">
-                        Tim<br>Profesional
-                    </span>
-
-                </div>
-
-
-                {{-- Material --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 80ms;">
-
-                    <svg class="w-10 h-10 text-brand-forest shrink-0"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M3 7l9-4 9 4-9 4-9-4z"
-                        />
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M3 12l9 4 9-4M3 17l9 4 9-4"
-                        />
-
-                    </svg>
-
-                    <span class="text-sm text-brand-forest leading-tight">
-                        Material<br>Berkualitas
-                    </span>
-
-                </div>
-
-
-                {{-- Garansi --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 160ms;">
-
-                    <svg class="w-10 h-10 text-brand-forest shrink-0"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"
-                        />
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M9 12l2 2 4-4"
-                        />
-
-                    </svg>
-
-                    <span class="text-sm text-brand-forest leading-tight">
-                        Garansi<br>Pekerjaan
-                    </span>
-
-                </div>
-
-
-                {{-- Desain --}}
-                <div class="reveal flex items-center justify-center gap-3 py-6 px-4 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 240ms;">
-
-                    <svg class="w-10 h-10 text-brand-forest shrink-0"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M3 10h18M5 10v8m14-8v8M3 18h18"
-                        />
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M4 10l2-5h12l2 5"
-                        />
-
-                    </svg>
-
-                    <span class="text-sm text-brand-forest leading-tight">
-                        Desain<br>Eksklusif
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
+@include('partials.landing.tentang')
 {{-- =========================================================
      VISI & MISI
      Section ini dibuat mandiri (style & script sendiri dengan
@@ -2983,107 +2571,7 @@
      Navbar: <a href="#layanan">Informasi</a>
      Jika ingin mengganti nama menu, href tetap bisa #layanan.
 ========================================================= --}}
-<section id="layanan" class="py-20 bg-brand-cream">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="text-center max-w-3xl mx-auto mb-16 reveal">
-
-            <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase block mb-2">
-                LAYANAN KAMI
-            </span>
-
-            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-brand-forest mb-4">
-                Solusi Interior untuk Berbagai Kebutuhan
-            </h2>
-
-            <p class="text-stone-500 leading-relaxed">
-                Kami menghadirkan solusi interior yang disesuaikan dengan kebutuhan,
-                karakter, dan fungsi setiap ruang.
-            </p>
-
-        </div>
-
-
-        @php
-            $defaultServiceImages = [
-                'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80',
-            ];
-        @endphp
-
-
-        {{-- =====================================================
-             SERVICE CARD
-             Kartu layanan: gambar lebih tinggi + rounded lebih
-             besar + border tipis + garis emas kecil di bawah
-             judul, supaya card terasa lebih "berisi" dan premium.
-
-             Ubah jumlah kolom: ganti "md:grid-cols-3".
-             Ubah jarak antar kartu: ganti "gap-8".
-             Ubah tinggi gambar: ganti "h-64" -> "h-72" di kelas img.
-             Ubah radius sudut: ganti "rounded-2xl".
-             Ubah bayangan: ganti "shadow-sm" / "hover:shadow-xl".
-        ====================================================== --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            @forelse($services as $index => $service)
-
-                @php
-                    $imageUrl = $service->image
-                        ? Storage::url($service->image)
-                        : $defaultServiceImages[$index % count($defaultServiceImages)];
-                @endphp
-
-                <article
-                    class="reveal group bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5"
-                    @if($index > 0)
-                        style="transition-delay: {{ min($index * 100, 500) }}ms"
-                    @endif
-                >
-
-                    <div class="overflow-hidden">
-
-                        <img
-                            src="{{ $imageUrl }}"
-                            alt="{{ $service->title }}"
-                            loading="lazy"
-                            class="h-56 sm:h-64 lg:h-72 w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            onerror="this.src='{{ $defaultServiceImages[0] }}'"
-                        >
-
-                    </div>
-
-                    <div class="p-6">
-
-                        <h3 class="title-underline font-serif font-bold text-xl text-brand-forest mb-2">
-                            {{ $service->title }}
-                        </h3>
-
-                        <div class="w-10 h-[2px] bg-brand-gold mb-3"></div>
-
-                        <p class="text-stone-500 text-sm leading-relaxed">
-                            {{ $service->description }}
-                        </p>
-
-                    </div>
-
-                </article>
-
-            @empty
-
-                <div class="col-span-full text-center text-stone-400 py-8">
-                    Layanan belum tersedia saat ini.
-                </div>
-
-            @endforelse
-
-        </div>
-
-    </div>
-
-</section>
+@include('partials.landing.layanan')
 
 {{-- =========================================================
      TIM KAMI
@@ -3091,7 +2579,7 @@
 
 <section
     id="our-team"
-    class="team-section relative overflow-hidden bg-[#f9f8f6] py-24 lg:py-32"
+    class="team-section relative overflow-hidden bg-brand-cream py-24 lg:py-32"
 >
     <div class="mx-auto max-w-6xl px-6 lg:px-8">
 
@@ -3198,13 +2686,13 @@
                                     <div
                                         class="flex h-full w-full items-center
                                                justify-center bg-gradient-to-br
-                                               from-white via-brand-cream
-                                               to-brand-gold/20"
+                                               from-[#2c3e35] to-[#3f5347]"
                                     >
                                         <span
                                             class="font-serif text-lg
-                                                   text-[#a89f8d]
-                                                   lg:text-2xl"
+                                                   tracking-wide
+                                                   text-[#e7d9b8]
+                                                   lg:text-3xl"
                                         >
                                             {{
                                                 collect(explode(' ', $member->name))
@@ -3692,195 +3180,13 @@
 {{-- =========================================================
      PORTOFOLIO
 ========================================================= --}}
-{{-- =====================================================
-     SECTION BACKGROUND
-     Sengaja diberi tint sangat halus dari warna brand (forest,
-     opacity 4%), BUKAN warna baru. Tujuannya supaya section ini
-     terlihat beda dari section "Tim Kami" tepat di atasnya
-     (yang juga terang), sehingga antar-section tidak menyatu.
-     Warna brand asli tetap sama, hanya opacity yang berubah.
-===================================================== --}}
+
 {{-- =========================================================
      TARGET ANCHOR: PORTOFOLIO
      Navbar: <a href="#portofolio">Portofolio</a>
      href dan id harus sama-sama "portofolio".
 ========================================================= --}}
-<section id="portofolio" class="py-20 bg-brand-cream">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="text-center max-w-3xl mx-auto mb-12 reveal">
-
-            <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase block mb-2">
-                GALERI PROYEK
-            </span>
-
-            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-brand-forest mb-4">
-                PORTOFOLIO KAMI
-            </h2>
-
-            <p class="text-stone-500 leading-relaxed">
-                Beberapa karya dan proyek interior yang telah kami kerjakan.
-            </p>
-
-        </div>
-
-
-        {{-- Filter --}}
-     <div
-            class="reveal flex flex-wrap justify-center items-center gap-2 mb-12"
-            id="portfolio-filters"
-        >
-
-            <button
-                type="button"
-                class="portfolio-filter px-5 py-2 rounded-full text-xs sm:text-sm font-medium bg-brand-forest text-white transition"
-                data-filter="all"
-            >
-                Semua
-            </button>
-
-            <button
-                type="button"
-                class="portfolio-filter px-5 py-2 rounded-full text-xs sm:text-sm font-medium bg-brand-cream text-brand-forest hover:bg-brand-forest hover:text-white transition"
-                data-filter="Rumah"
-            >
-                Desain Interior Rumah
-            </button>
-
-            <button
-                type="button"
-                class="portfolio-filter px-5 py-2 rounded-full text-xs sm:text-sm font-medium bg-brand-cream text-brand-forest hover:bg-brand-forest hover:text-white transition"
-                data-filter="Kantor"
-            >
-                Desain Interior Kantor
-            </button>
-
-            <button
-                type="button"
-                class="portfolio-filter px-5 py-2 rounded-full text-xs sm:text-sm font-medium bg-brand-cream text-brand-forest hover:bg-brand-forest hover:text-white transition"
-                data-filter="Custom Interior"
-            >
-               Desain Custom Interior
-            </button>
-
-        </div>
-
-        {{-- Portfolio Carousel --}}
-        <div class="portfolio-carousel relative">
-
-            {{-- Tombol Sebelumnya --}}
-            <button
-                type="button"
-                id="portfolio-prev"
-                class="portfolio-arrow portfolio-arrow-left"
-                aria-label="Portofolio sebelumnya"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                    <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-
-            {{-- Area yang terlihat --}}
-            <div
-                id="portfolio-viewport"
-                class="portfolio-viewport"
-            >
-                <div
-                    id="portfolio-grid"
-                    class="portfolio-grid"
-                >
-
-                    @forelse($portfolios as $p)
-
-                        {{-- =====================================================
-                             PORTFOLIO CARD
-                             Diperbesar & diberi border tipis supaya gambar jadi
-                             fokus utama (bukan sekadar thumbnail kecil). Lebar
-                             kartu TETAP diatur oleh CSS .portfolio-item di atas
-                             (untuk carousel) — di sini hanya mengubah tampilan
-                             di dalam kartu, bukan lebar/posisinya.
-
-                             Ubah tinggi gambar: ganti "h-64 sm:h-72".
-                             Ubah radius sudut: ganti "rounded-2xl".
-                        ====================================================== --}}
-                        <article
-                            class="portfolio-item reveal group bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 rounded-2xl border border-brand-forest/10 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer"
-                            data-category="{{ $p['category'] ?? '' }}"
-                            data-portfolio-id="{{ $p['id'] ?? 0 }}"
-                        >
-
-                            <div class="h-64 sm:h-72 bg-stone-100 relative overflow-hidden group">
-
-                                <img
-                                    src="{{ $p['image_url'] ?? '' }}"
-                                    alt="{{ $p['title'] ?? 'Portofolio' }}"
-                                    loading="lazy"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    onerror="this.src='https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'"
-                                >
-
-                                {{-- Scrim halus di bawah gambar supaya badge & judul lebih menyatu dengan foto --}}
-                                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/25 to-transparent"></div>
-
-                                <div class="absolute top-3 left-3 bg-brand-gold text-brand-forest text-[10px] tracking-wider uppercase font-bold px-3 py-1.5 rounded-full shadow-sm">
-                                    {{ $p['category'] ?? 'Interior' }}
-                                </div>
-
-                                <div class="absolute inset-0 bg-brand-forest/0 group-hover:bg-brand-forest/20 transition-colors duration-300 flex items-center justify-center">
-
-                                    <span class="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-gradient-to-br from-white via-brand-cream to-brand-gold/15 text-brand-forest text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-full shadow">
-                                        Lihat Detail Proyek
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="p-6">
-
-                                <h3 class="title-underline font-serif font-bold text-lg text-brand-forest mb-1">
-                                    {{ $p['title'] ?? '' }}
-                                </h3>
-
-                                <div class="w-8 h-[2px] bg-brand-gold/60 mb-2"></div>
-
-                                <p class="text-stone-500 text-xs sm:text-sm font-light line-clamp-3">
-                                    {{ $p['description'] ?? '' }}
-                                </p>
-
-                            </div>
-
-                        </article>
-
-                    @empty
-
-                        <div class="portfolio-empty text-center text-stone-400 py-12">
-                            Belum ada portofolio saat ini.
-                        </div>
-
-                    @endforelse
-
-                </div>
-            </div>
-
-            {{-- Tombol Berikutnya --}}
-            <button
-                type="button"
-                id="portfolio-next"
-                class="portfolio-arrow portfolio-arrow-right"
-                aria-label="Portofolio berikutnya"
-            >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                    <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
+@include('partials.landing.portofolio')
 
 
 {{-- =========================================================
@@ -4972,253 +4278,7 @@
      section ini terpisah secara visual dari "Alur Kerja"
      tepat di atasnya.
 ===================================================== --}}
-<section id="testimoni" class="py-20 bg-brand-cream">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {{-- HEADER --}}
-        <div class="text-center mb-10 lg:mb-12 reveal">
-
-            <h2 class="text-4xl sm:text-5xl lg:text-[52px] font-semibold tracking-tight text-black">
-                TESTIMONI
-            </h2>
-
-            <div class="divider-grow origin-center w-20 h-[1.5px] bg-brand-gold mx-auto mt-3" data-divider></div>
-
-        </div>
-
-
-        {{-- JIKA BELUM ADA TESTIMONI --}}
-        @if(empty($testimonials) || count($testimonials) === 0)
-
-            <div class="text-center py-12">
-
-                <p class="text-stone-400">
-                    Belum ada testimonial.
-                </p>
-
-            </div>
-
-        @else
-
-            @php
-                $testimonialCount = count($testimonials);
-            @endphp
-
-
-            {{-- =================================================
-                 PEMBUNGKUS SLIDER
-            ================================================== --}}
-            <div
-                id="testimonialSlider"
-                class="testimonial-slider"
-            >
-
-                {{-- =================================================
-                     CARD TESTIMONI
-                     BAGIAN INI YANG BERGERAK KE SAMPING
-                ================================================== --}}
-                <div class="testimonial-viewport">
-
-                    <div
-                        id="testimonialTrack"
-                        class="testimonial-track"
-                    >
-
-                        @foreach($testimonials as $index => $t)
-
-                            @php
-                                $position = trim(
-                                    ($t->position ?? '') .
-                                    ($t->position && $t->company ? ' · ' : '') .
-                                    ($t->company ?? '')
-                                );
-                            @endphp
-
-
-                            {{-- =================================================
-                                 1 CARD
-                            ================================================== --}}
-                            <article class="testimonial-slide">
-
-                                {{-- FOTO MEMENUHI CARD --}}
-                                <div class="testimonial-image">
-
-                                    @if($t->photo)
-
-                                        <img
-                                            src="{{ Storage::url($t->photo) }}"
-                                            alt="{{ $t->name }}"
-                                        >
-
-                                    @else
-
-                                        <div class="w-full h-full flex items-center justify-center bg-stone-300">
-
-                                            <span class="text-stone-500">
-                                                Tidak ada foto
-                                            </span>
-
-                                        </div>
-
-                                    @endif
-
-                                </div>
-
-
-                                {{-- =================================================
-                                     ISI DI ATAS FOTO
-                                ================================================== --}}
-                                <div class="testimonial-content">
-
-                                    <h3>
-                                        {{ $t->company ?: $t->name }}
-                                    </h3>
-
-
-                                    @if($t->message)
-
-                                        <p class="testimonial-message">
-                                            "{{ $t->message }}"
-                                        </p>
-
-                                    @endif
-
-
-                                    {{-- NAMA TANPA FOTO BULAT --}}
-                                    <div class="testimonial-client">
-
-                                        <p class="testimonial-client-name">
-                                            {{ $t->name }}
-                                        </p>
-
-                                        @if($position)
-
-                                            <p class="testimonial-client-position">
-                                                {{ $position }}
-                                            </p>
-
-                                        @endif
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- NOMOR --}}
-                                <div class="testimonial-counter">
-
-                                    {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
-
-                                    <span class="mx-1 opacity-50">
-                                        /
-                                    </span>
-
-                                    {{ str_pad($testimonialCount, 2, '0', STR_PAD_LEFT) }}
-
-                                </div>
-
-                            </article>
-
-                        @endforeach
-
-                    </div>
-
-                </div>
-
-
-                {{-- =================================================
-                     PANAH
-                     INI POSISINYA DI LUAR CARD
-                     
-                     ← [ CARD ] →
-                ================================================== --}}
-                @if($testimonialCount > 1)
-
-                    <div class="testimonial-navigation">
-
-                        {{-- PANAH KIRI --}}
-                        <button
-                            type="button"
-                            id="testimonialPrev"
-                            class="testimonial-prev"
-                            aria-label="Testimoni sebelumnya"
-                        >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M15 18l-6-6 6-6"/>
-                            </svg>
-
-                        </button>
-
-
-                        {{-- PANAH KANAN --}}
-                        <button
-                            type="button"
-                            id="testimonialNext"
-                            class="testimonial-next"
-                            aria-label="Testimoni berikutnya"
-                        >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-
-                        </button>
-
-                    </div>
-
-
-                    {{-- =================================================
-                         DOTS DI BAWAH CARD
-                    ================================================== --}}
-                    <div
-                        id="testimonialDots"
-                        class="testimonial-dots"
-                    >
-
-                        @foreach($testimonials as $index => $t)
-
-                            <button
-                                type="button"
-                                class="testimonial-dot {{ $index === 0 ? 'active' : '' }}"
-                                data-testimonial-dot="{{ $index }}"
-                                aria-label="Lihat testimoni {{ $index + 1 }}"
-                            ></button>
-
-                        @endforeach
-
-                    </div>
-
-                @endif
-
-            </div>
-
-        @endif
-
-    </div>
-
-</section>
+@include('partials.landing.testimoni')
 
 {{-- =========================================================
      KLIEN & MITRA
@@ -5498,7 +4558,7 @@
     </div>
 </section>
 
-{{-- =========================================================
+<!-- {{-- =========================================================
      CTA STRIP — tambahan visual terinspirasi referensi
      Tidak mengubah form / database / fitur lama.
 ========================================================= --}}
@@ -5524,7 +4584,7 @@
             </a>
         </div>
     </div>
-</section>
+</section> -->
 
 {{-- =========================================================
      APPOINTMENT / KONSULTASI
@@ -5535,331 +4595,7 @@
      Navbar: <a href="#kontak">Kontak</a>
      Tombol CTA juga bisa memakai href="#kontak".
 ========================================================= --}}
-<section id="kontak" class="py-20 bg-brand-cream">
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-10 items-start">
-
-            {{-- Intro --}}
-            <div class="reveal reveal-left">
-
-                <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase block mb-3">
-                    KONSULTASI
-                </span>
-
-                <h2 class="font-serif text-4xl sm:text-5xl font-semibold text-brand-forest leading-tight mb-5">
-                    Wujudkan Ruang Impian Anda
-                </h2>
-
-                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-6" data-divider></div>
-
-                <p class="text-stone-600 leading-relaxed mb-6">
-                    Ceritakan kebutuhan ruang Anda kepada tim Bumiyuji Living.
-                    Kami siap membantu memberikan solusi interior yang sesuai.
-                </p>
-
-                <div class="space-y-3 text-sm text-stone-600">
-
-                    <div class="flex items-start gap-3">
-                        <span class="text-brand-gold">✓</span>
-                        <span>Konsultasi awal tanpa biaya</span>
-                    </div>
-
-                    <div class="flex items-start gap-3">
-                        <span class="text-brand-gold">✓</span>
-                        <span>Diskusi kebutuhan dan konsep ruang</span>
-                    </div>
-
-                    <div class="flex items-start gap-3">
-                        <span class="text-brand-gold">✓</span>
-                        <span>Terhubung langsung melalui WhatsApp</span>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            {{-- Form --}}
-            <div class="form-card reveal reveal-right bg-[#F2EBDD] border border-[#B9A56F]/20 shadow-[0_12px_32px_-16px_rgba(48,72,63,0.25)] rounded-2xl p-6 sm:p-8 transition-shadow duration-500">
-
-                <form id="appointment-form" onsubmit="handleFormSubmit(event)" class="space-y-5">
-
-                    <div>
-
-                        <label
-                            for="form-name"
-                            class="block text-sm font-medium text-brand-forest mb-2"
-                        >
-                            Nama
-                        </label>
-
-                        <input
-                            id="form-name"
-                            type="text"
-                            required
-                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
-                            placeholder="Nama lengkap"
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label
-                            for="form-phone"
-                            class="block text-sm font-medium text-brand-forest mb-2"
-                        >
-                            No. HP / WhatsApp
-                        </label>
-
-                        <input
-                            id="form-phone"
-                            type="tel"
-                            required
-                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
-                            placeholder="08xxxxxxxxxx"
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label
-                            for="form-email"
-                            class="block text-sm font-medium text-brand-forest mb-2"
-                        >
-                            Email <span class="text-stone-400">(opsional)</span>
-                        </label>
-
-                        <input
-                            id="form-email"
-                            type="email"
-                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
-                            placeholder="email@contoh.com"
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label
-                            for="form-address"
-                            class="block text-sm font-medium text-brand-forest mb-2"
-                        >
-                            Alamat Proyek
-                        </label>
-
-                        <textarea
-                            id="form-address"
-                            rows="3"
-                            required
-                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none resize-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
-                            placeholder="Lokasi proyek"
-                        ></textarea>
-
-                    </div>
-
-
-                    <div>
-
-                        <label
-                            for="form-project"
-                            class="block text-sm font-medium text-brand-forest mb-2"
-                        >
-                            Rencana Project
-                        </label>
-
-                        <textarea
-                            id="form-project"
-                            rows="4"
-                            required
-                            class="w-full rounded-lg border border-[#DCD2BC] bg-gradient-to-b from-white to-brand-cream/50 px-4 py-3 text-sm outline-none resize-none transition-colors duration-300 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
-                            placeholder="Ceritakan kebutuhan interior Anda..."
-                        ></textarea>
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="btn-shine relative w-full overflow-hidden bg-brand-forest text-white font-semibold text-sm uppercase tracking-wide px-6 py-4 rounded-lg transition-all duration-300 hover:bg-[#4F6862] hover:-translate-y-0.5 hover:shadow-lg"
-                    >
-                        Kirim Konsultasi via WhatsApp
-                    </button>
-
-                </form>
-
-            </div>
-
-
-            {{-- Informasi Hub Korporat --}}
-            <div class="reveal reveal-right">
-
-                <h3 class="font-serif text-2xl font-semibold text-brand-forest mb-2">
-                    Informasi Hub Korporat
-                </h3>
-
-                <div class="divider-grow origin-left w-16 h-[2px] bg-brand-gold mb-6" data-divider></div>
-
-                <div class="space-y-5">
-
-                    {{-- Kantor Utama (Pusat & Logistik) --}}
-                    @if (!empty($settings['address']))
-                        <div class="flex items-start gap-4">
-
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M9 13h.01M15 10h.01M15 13h.01" />
-                                </svg>
-                            </span>
-
-                            <div>
-                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                    Kantor Utama (Pusat &amp; Logistik)
-                                </span>
-                                <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                    {{ $settings['address'] }}
-                                </p>
-                                @if (!empty($settings['address_note']))
-                                    <p class="text-xs text-stone-500 mt-1">
-                                        {{ $settings['address_note'] }}
-                                    </p>
-                                @endif
-                            </div>
-
-                        </div>
-                    @endif
-
-                    {{-- Kantor Operasional & Administrasi --}}
-                    @if (!empty($settings['secondary_address']))
-                        <div class="flex items-start gap-4">
-
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </span>
-
-                            <div>
-                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                    Kantor Operasional &amp; Administrasi
-                                </span>
-                                <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                    {{ $settings['secondary_address'] }}
-                                </p>
-                                @if (!empty($settings['secondary_address_note']))
-                                    <p class="text-xs text-stone-500 mt-1">
-                                        {{ $settings['secondary_address_note'] }}
-                                    </p>
-                                @endif
-                            </div>
-
-                        </div>
-                    @endif
-
-                    {{-- WhatsApp Hotline --}}
-                    <div class="flex items-start gap-4">
-
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.001 2C6.478 2 2 6.477 2 12c0 1.9.526 3.68 1.44 5.2L2 22l4.94-1.396A9.95 9.95 0 0012.001 22C17.524 22 22 17.523 22 12S17.524 2 12.001 2zm0 18.2a8.15 8.15 0 01-4.35-1.26l-.312-.19-3.033.858.834-2.958-.202-.318A8.15 8.15 0 013.85 12c0-4.5 3.65-8.15 8.151-8.15 4.5 0 8.15 3.65 8.15 8.15 0 4.501-3.65 8.2-8.15 8.2z"/>
-                            </svg>
-                        </span>
-
-                        <div>
-                            <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                WhatsApp Hotline (Kantor Utama)
-                            </span>
-                            <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                {{ $settings['wa_number'] ?? '0813 1111 4523' }}
-                            </p>
-                            @if (!empty($settings['office_hours']))
-                                <p class="text-xs text-stone-500 mt-1">
-                                    {{ $settings['office_hours'] }}
-                                </p>
-                            @endif
-                        </div>
-
-                    </div>
-
-                    {{-- Email --}}
-                    @if (!empty($settings['email']))
-                        <div class="flex items-start gap-4">
-
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-forest">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </span>
-
-                            <div>
-                                <span class="block text-[11px] font-semibold tracking-widest text-brand-gold uppercase mb-1">
-                                    Surel Rekanan &amp; Bisnis
-                                </span>
-                                <p class="text-sm font-semibold text-brand-forest leading-snug">
-                                    {{ $settings['email'] }}
-                                </p>
-                            </div>
-
-                        </div>
-                    @endif
-
-                </div>
-
-
-                {{-- Peta Lokasi --}}
-                @php
-                    $mapsQueryAddress = trim(($settings['address'] ?? '').' '.($settings['address_note'] ?? ''));
-                    $mapsOpenUrl = !empty($settings['maps_url'])
-                        ? $settings['maps_url']
-                        : ($mapsQueryAddress ? 'https://www.google.com/maps/search/?api=1&query='.urlencode($mapsQueryAddress) : null);
-                    $mapsEmbedUrl = $mapsQueryAddress ? 'https://www.google.com/maps?q='.urlencode($mapsQueryAddress).'&output=embed' : null;
-                @endphp
-                @if ($mapsEmbedUrl)
-                    <div class="relative mt-6 rounded-2xl overflow-hidden border border-stone-200 h-[260px]">
-
-                        @if ($mapsOpenUrl)
-                            <a
-                                href="{{ $mapsOpenUrl }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-brand-forest shadow-md hover:bg-white transition"
-                            >
-                                Buka di Maps
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                            </a>
-                        @endif
-
-                        <iframe
-                            title="Lokasi Kantor Bumiyuji Living"
-                            src="{{ $mapsEmbedUrl }}"
-                            width="100%"
-                            height="100%"
-                            style="border:0"
-                            loading="lazy"
-                            referrerpolicy="no-referrer"
-                            class="w-full h-full"
-                        ></iframe>
-
-                    </div>
-                @endif
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
+@include('partials.landing.kontak')
 
 
 {{-- =========================================================
@@ -6081,18 +4817,73 @@
                 </div>
 
 
-                {{-- Divisi Terafiliasi --}}
+                {{-- =========================================================
+                     DIVISI TERAFILIASI — tampil sebagai identitas
+                     "corporate ecosystem": header perusahaan induk (logo,
+                     nama, brand, intro) lalu daftar divisi terafiliasi.
+
+                     Header perusahaan induk berasal dari Pengaturan Website
+                     ($settings['parent_company_*'] / 'ecosystem_intro').
+                     Daftar divisi TETAP dari $affiliatedDivisions / CMS
+                     Divisi Terafiliasi — tidak diubah sumber datanya.
+                ========================================================= --}}
                 <div>
 
-                    <h4 class="font-serif font-bold text-sm sm:text-base text-brand-forest mb-6 uppercase tracking-wide">
-                        Divisi Terafiliasi
-                    </h4>
+                    {{-- Perusahaan induk --}}
+                    <div class="flex items-start gap-3.5 mb-4">
 
-                    <div class="space-y-4">
+                        @if (!empty($settings['parent_company_logo_url']))
+
+                            <span class="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-brand-gold/25">
+                                <img
+                                    src="{{ $settings['parent_company_logo_url'] }}"
+                                    alt="{{ $settings['parent_company_name'] ?? 'Logo Perusahaan Induk' }}"
+                                    loading="lazy"
+                                    class="h-full w-full object-contain p-2"
+                                >
+                            </span>
+
+                        @else
+
+                            <span class="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-brand-cream border border-brand-gold/25 font-serif font-extrabold text-lg text-brand-forest">
+                                {{ strtoupper(substr(trim($settings['parent_company_name'] ?? 'A'), 0, 1)) }}
+                            </span>
+
+                        @endif
+
+                        <div class="min-w-0 pt-0.5">
+                            <p class="text-sm sm:text-base font-serif font-bold text-brand-forest leading-snug">
+                                {{ $settings['parent_company_name'] ?? 'PT Arada Integra Indonesia' }}
+                            </p>
+
+                            @if (!empty($settings['parent_company_brand']))
+                                <p class="text-xs text-stone-500 leading-snug">
+                                    ({{ $settings['parent_company_brand'] }})
+                                </p>
+                            @endif
+                        </div>
+
+                    </div>
+
+                    @if (!empty($settings['ecosystem_intro']))
+                        <p class="text-xs text-stone-500 leading-relaxed mb-5 max-w-xs">
+                            {{ $settings['ecosystem_intro'] }}
+                        </p>
+                    @endif
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="h-px flex-1 bg-brand-gold/25"></span>
+                        <h4 class="font-serif font-bold text-xs sm:text-sm text-brand-forest uppercase tracking-[0.18em]">
+                            Divisi Terafiliasi
+                        </h4>
+                    </div>
+
+                    {{-- Daftar divisi terafiliasi (tetap dari $affiliatedDivisions / CMS) --}}
+                    <div class="space-y-3.5">
 
                         @forelse ($affiliatedDivisions as $divisi)
 
-                            <div class="flex items-start gap-4 rounded-2xl border border-brand-gold/20 bg-white/60 p-4">
+                            <div class="flex items-start gap-4 rounded-2xl border border-brand-gold/20 bg-white/60 p-4 transition-colors duration-300 hover:border-brand-gold/45 hover:bg-white">
 
                                 @if (!empty($divisi['logo']))
 
@@ -6160,22 +4951,6 @@
 </footer>
 
 
-{{-- =========================================================
-     FLOATING WHATSAPP — quick contact
-========================================================= --}}
-<a
-    id="byj-floating-wa"
-    href="https://wa.me/{{ $settings['wa_number'] ?? '6281311114523' }}?text=Halo%20Bumiyuji%20Living%2C%20saya%20ingin%20berkonsultasi%20mengenai%20desain%20interior."
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Hubungi Bumiyuji melalui WhatsApp"
-    class="byj-float-wa fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-[90] flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-[#8D9070] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#777A5F]"
->
-    <svg class="h-6 w-6 sm:h-7 sm:w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.149.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.001 2C6.478 2 2 6.477 2 12c0 1.9.526 3.68 1.44 5.2L2 22l4.94-1.396A9.95 9.95 0 0012.001 22C17.524 22 22 17.523 22 12S17.524 2 12.001 2zm0 18.2a8.15 8.15 0 01-4.35-1.26l-.312-.19-3.033.858.834-2.958-.202-.318A8.15 8.15 0 013.85 12c0-4.5 3.65-8.15 8.151-8.15 4.5 0 8.15 3.65 8.15 8.15 0 4.501-3.65 8.2-8.15 8.2z"/>
-    </svg>
-</a>
 
 {{-- =========================================================
      BACK TO TOP
@@ -6352,6 +5127,89 @@ if (heroParallaxEl && heroParallaxSection && !prefersReducedMotionParallax) {
 
 }
 
+/* =========================================================
+   HERO SLIDER (multi-image, zoom-out -> blur singkat -> next)
+   Layer-based crossfade: setiap ".hero-slide" tersusun stacked
+   (position absolute) di dalam "[data-hero-slides]". Hanya slide
+   dengan class "is-active" yang terlihat; saat pindah slide,
+   slide lama & baru sama-sama diberi class "is-bridging" selama
+   HERO_BRIDGE_MS (blur singkat sebagai jembatan), lalu slide lama
+   disembunyikan dan scale-nya direset instan (tanpa transisi) agar
+   siap zoom lagi di putarannya berikutnya.
+
+   Teks Hero (judul/subtitle/tombol) TIDAK disentuh sama sekali oleh
+   script ini — hanya elemen di dalam "[data-hero-slides]" yang
+   berganti.
+========================================================== */
+
+(function initHeroSlider() {
+
+    const track = document.querySelector('[data-hero-slides]');
+    if (!track) return;
+
+    const slides = Array.from(track.querySelectorAll('[data-hero-slide]'));
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Hanya 1 gambar (atau kosong): tampilkan statis, tanpa autoplay.
+    if (slides.length <= 1) return;
+
+    // Reduced motion: tetap ganti slide (supaya semua gambar terlihat
+    // dalam waktu lama), tapi tanpa efek zoom/blur — cukup tampil/hilang.
+    const HERO_DISPLAY_MS = 4000; // waktu tampil utama tiap gambar
+    const HERO_BRIDGE_MS = prefersReducedMotion ? 0 : 450; // jembatan blur singkat
+
+    let current = 0;
+
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === 0);
+    });
+
+    function resetZoomInstantly(slide) {
+        const zoomEl = slide.querySelector('.hero-slide-zoom');
+        if (!zoomEl) return;
+
+        zoomEl.classList.add('no-zoom-transition');
+        // Force reflow supaya browser benar-benar menerapkan "no-zoom-transition"
+        // sebelum scale dikembalikan ke 1.08, baru transisi diaktifkan lagi.
+        // eslint-disable-next-line no-unused-expressions
+        zoomEl.offsetHeight;
+
+        requestAnimationFrame(() => {
+            zoomEl.classList.remove('no-zoom-transition');
+        });
+    }
+
+    function advance() {
+        const next = (current + 1) % slides.length;
+        const outgoing = slides[current];
+        const incoming = slides[next];
+
+        // Slide baru mulai fade-in, sekaligus mulai zoom out dari
+        // scale(1.08) karena class "is-active" dipasang di saat yang
+        // sama. Blur jembatan hanya dipakai jika motion tidak dikurangi.
+        incoming.classList.add('is-active');
+
+        if (!prefersReducedMotion) {
+            incoming.classList.add('is-bridging');
+            outgoing.classList.add('is-bridging');
+        }
+
+        window.setTimeout(() => {
+            outgoing.classList.remove('is-active', 'is-bridging');
+            incoming.classList.remove('is-bridging');
+
+            // Slide lama disiapkan ulang (scale kembali ke 1.08 tanpa
+            // transisi) supaya giliran berikutnya zoom dari awal lagi.
+            resetZoomInstantly(outgoing);
+
+            current = next;
+        }, HERO_BRIDGE_MS);
+    }
+
+    window.setInterval(advance, HERO_DISPLAY_MS);
+
+})();
+
 window.addEventListener(
     'scroll',
     handleScroll,
@@ -6492,43 +5350,22 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
 
 
     /* =========================================================
-       PORTFOLIO FILTER + CAROUSEL (INFINITE MARQUEE)
-       - Desktop: 3 kartu terlihat
-       - Tablet : 2 kartu terlihat
-       - Mobile : 1 kartu terlihat
-       - Kartu bergerak terus menerus (marquee) dengan kecepatan
-         konstan, tanpa pernah terlihat berhenti atau "loncat"
-         balik ke kartu pertama.
-       - Pause saat hover / touch / swipe, lalu jalan lagi otomatis.
-       - Tombol Next/Prev tetap bisa dipakai untuk geser manual.
-       - Filter kategori tetap berjalan seperti sebelumnya.
-
-       ---------------------------------------------------------
-       KENAPA CAROUSEL LAMA TERLIHAT "PATAH" / TIDAK SEAMLESS?
-       ---------------------------------------------------------
-       Versi sebelumnya adalah carousel "per halaman": track digeser
-       sejauh lebar viewport tiap kali pindah halaman, memakai CSS
-       transition. Begitu sampai halaman terakhir, variabel halaman
-       cuma di-reset ke 0 lalu transform ikut dikembalikan ke 0 —
-       padahal transisinya tetap aktif. Akibatnya, track terlihat
-       meluncur MUNDUR jauh dari halaman terakhir ke halaman
-       pertama, alih-alih terasa seperti barisan kartu yang tidak
-       pernah putus. Itu sebabnya terasa "berhenti sebentar" lalu
-       "loncat balik" — bukan loop yang mulus.
-
-       SOLUSINYA (teknik yang dipakai di bawah ini):
-       1. Kartu kategori yang sedang tampil di-KLON (digandakan) dan
-          ditempel berulang setelah kartu asli, sampai total lebar
-          track jauh lebih panjang dari layar.
-       2. Track digeser terus-menerus ke kiri sedikit demi sedikit
-          setiap frame (bukan meloncat per halaman).
-       3. Begitu track sudah bergeser sejauh persis satu "pola"
-          (yaitu lebar seluruh kartu asli yang sedang tampil), posisi
-          langsung ditambah kembali sebesar satu pola itu juga.
-          Karena kartu klon di posisi itu SAMA PERSIS dengan kartu
-          asli di posisi awal, lompatan ini tidak terlihat sama
-          sekali oleh mata — hasilnya terasa seperti barisan kartu
-          tanpa akhir.
+       PORTFOLIO FILTER + MARQUEE (LOOP TANPA JEDA + PANAH MANUAL)
+       - Sama seperti marquee "Klien & Mitra": kartu bergeser terus
+         menerus TANPA berhenti-berhenti per kartu.
+       - Bedanya dengan Klien & Mitra: (1) kecepatannya sedikit lebih
+         lambat, (2) ada tombol panah untuk menggeser manual satu
+         kartu — geser otomatis tetap lanjut setelah itu.
+       - Posisi track digerakkan lewat JavaScript (requestAnimationFrame)
+         setiap frame, bukan CSS @keyframes, supaya tombol panah bisa
+         "menumpangi" posisi yang sama tanpa membuat animasi terlihat
+         loncat atau berhenti.
+       - Teknik loop-nya: kartu asli yang terlihat (sesuai filter)
+         digandakan (kloning) secukupnya sampai satu putaran cukup
+         panjang, lalu seluruh putaran itu diduplikasi sekali lagi
+         persis sama. Posisi digeser sampai satu putaran penuh lalu
+         "dibungkus" kembali ke 0 — karena kedua putaran identik,
+         pergantiannya mulus tanpa jeda.
     ========================================================== */
 
     const portfolioFilterButtons =
@@ -6547,54 +5384,36 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
         document.getElementById('portfolio-next');
 
     /*
-     * PENTING: ini adalah snapshot kartu ASLI hasil render Blade,
-     * diambil SEBELUM kita menambahkan kartu hasil kloning.
-     * Kode di bagian modal (di bawah file ini) memakai variabel
-     * "portfolioItems" ini juga untuk membuka detail portofolio,
-     * jadi isinya sengaja tidak boleh berubah.
+     * Snapshot kartu ASLI hasil render Blade (dipakai juga oleh
+     * modal detail portofolio di bagian bawah file ini).
      */
     const portfolioItems =
         document.querySelectorAll('.portfolio-item');
 
     /*
-     * Apakah pengguna mengaktifkan "reduce motion" di perangkatnya?
-     * Kalau iya, kita matikan gerakan otomatis (marquee) supaya
-     * tidak memicu pusing/mual, tapi tombol next/prev tetap jalan.
+     * Catatan: marquee ini SENGAJA tetap jalan otomatis walaupun
+     * "Reduce Motion" aktif di sistem operasi, supaya perilakunya
+     * konsisten dan selalu terlihat bergerak seperti yang diminta.
      */
-    const portfolioReducedMotion =
-        typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /*
-     * Kecepatan geser otomatis, dalam pixel per detik.
-     * Dipakai bersama delta waktu antar frame supaya kecepatannya
-     * selalu konstan, tidak peduli seberapa cepat/lambat frame rate
-     * perangkat pengguna.
-     */
-    const PORTFOLIO_SPEED_PX_PER_SEC = 45;
+    /* Sedikit lebih lambat daripada marquee Klien & Mitra (4s/item, min 18s). */
+    const PORTFOLIO_MARQUEE_SECONDS_PER_ITEM = 5.5;
+    const PORTFOLIO_MARQUEE_MIN_SECONDS = 26;
 
-    /*
-     * Durasi animasi halus saat tombol Next/Prev ditekan (ms).
-     */
-    const PORTFOLIO_STEP_DURATION = 450;
+    /* Lama animasi satu klik panah (ms). */
+    const PORTFOLIO_NUDGE_MS = 420;
 
-    /* Posisi geser track saat ini (selalu <= 0). */
-    let portfolioTranslateX = 0;
+    /* Setelah klik panah, tunggu sekian ms sebelum geser otomatis lanjut lagi. */
+    const PORTFOLIO_RESUME_MS = 1200;
 
-    /* Lebar (px) satu "pola" penuh = total lebar kartu yang sedang tampil. */
-    let portfolioPatternWidth = 0;
-
-    /* Lebar (px) satu langkah kartu, dipakai tombol Next/Prev. */
-    let portfolioItemStep = 0;
-
+    let portfolioOffsetPx = 0;
+    let portfolioHalfWidthPx = 0;
+    let portfolioItemFootprint = 0;
+    let portfolioSpeedPxPerSec = 0;
+    let portfolioPaused = false;
+    let portfolioLastTimestamp = null;
     let portfolioRafId = null;
-    let portfolioLastFrameTime = null;
-    let portfolioIsAnimatingStep = false;
     let portfolioResumeTimer = null;
-
-    let portfolioTouchStartX = 0;
-    let portfolioTouchStartY = 0;
-    let portfolioIsPointerDown = false;
 
     function getVisiblePortfolioItems() {
         return Array.from(portfolioItems).filter(function (item) {
@@ -6602,15 +5421,6 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
         });
     }
 
-    function applyPortfolioTransform() {
-        portfolioGrid.style.transform =
-            'translate3d(' + portfolioTranslateX + 'px, 0, 0)';
-    }
-
-    /*
-     * Membuang semua kartu hasil kloning yang lama, supaya bisa
-     * dibangun ulang (dipakai lagi setiap ganti filter / resize).
-     */
     function clearPortfolioClones() {
         portfolioGrid
             .querySelectorAll('.portfolio-item[data-portfolio-clone="true"]')
@@ -6619,236 +5429,48 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
             });
     }
 
-    /*
-     * Menempelkan satu set salinan (clone) dari kartu-kartu yang
-     * sedang tampil, tepat setelah kartu aslinya di dalam track.
-     */
-    function appendPortfolioCloneSet(visibleOriginals) {
-        visibleOriginals.forEach(function (original) {
-            const clone = original.cloneNode(true);
+    function makePortfolioClone(original) {
+        const clone = original.cloneNode(true);
 
-            /* Tandai sebagai duplikat, sembunyikan dari screen reader. */
-            clone.setAttribute('data-portfolio-clone', 'true');
-            clone.setAttribute('aria-hidden', 'true');
-            clone.setAttribute('tabindex', '-1');
+        clone.setAttribute('data-portfolio-clone', 'true');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.setAttribute('tabindex', '-1');
 
-            portfolioGrid.appendChild(clone);
-        });
+        return clone;
+    }
+
+    function applyPortfolioTransform() {
+        portfolioGrid.style.transform =
+            'translate3d(' + portfolioOffsetPx + 'px, 0, 0)';
     }
 
     /*
-     * Inti dari teknik "infinite marquee":
-     * membangun ulang track = [kartu asli yang tampil] + [kloningan
-     * berulang], lalu mengukur lebar satu pola penuh berdasarkan
-     * posisi asli DOM (bukan tebak-tebakan lewat rumus CSS), supaya
-     * hasilnya akurat di breakpoint manapun.
+     * Membangun ulang track marquee dari kartu yang sedang terlihat
+     * (sesuai filter aktif):
+     *
+     *   [putaran 1: kartu asli + klon secukupnya] [putaran 2: identik]
+     *
+     * Posisi digeser sampai akhir putaran 1, lalu dibungkus kembali
+     * ke 0 — karena putaran 2 identik dengan putaran 1, pergantiannya
+     * mulus tanpa jeda.
      */
-    function buildPortfolioClones() {
+    function rebuildPortfolioMarquee() {
+
+        portfolioGrid.style.transition = 'none';
+
         clearPortfolioClones();
 
-        const visibleOriginals = getVisiblePortfolioItems();
+        const originals = getVisiblePortfolioItems();
+        const total = originals.length;
 
-        if (visibleOriginals.length === 0) {
-            portfolioPatternWidth = 0;
-            portfolioItemStep = 0;
-            return;
-        }
+        portfolioOffsetPx = 0;
+        portfolioHalfWidthPx = 0;
+        portfolioItemFootprint = 0;
+        portfolioSpeedPxPerSec = 0;
 
-        /* Tempel satu set klon dulu untuk keperluan pengukuran. */
-        appendPortfolioCloneSet(visibleOriginals);
-
-        const firstOriginalRect =
-            visibleOriginals[0].getBoundingClientRect();
-
-        const firstClone =
-            portfolioGrid.querySelector('.portfolio-item[data-portfolio-clone="true"]');
-
-        const firstCloneRect = firstClone.getBoundingClientRect();
-
-        /* Jarak dari kartu asli pertama ke klon pertama = 1 pola penuh. */
-        portfolioPatternWidth = firstCloneRect.left - firstOriginalRect.left;
-        portfolioItemStep = portfolioPatternWidth / visibleOriginals.length;
-
-        if (!(portfolioPatternWidth > 0)) {
-            portfolioPatternWidth = 0;
-            return;
-        }
-
-        /*
-         * Supaya tidak pernah ada area kosong (misalnya karena hasil
-         * filter cuma menyisakan 1-2 kartu), gandakan terus sampai
-         * total lebar track minimal 2x lebar viewport yang terlihat.
-         */
-        const viewportWidth = portfolioViewport.clientWidth || 0;
-        const minTotalWidth = viewportWidth * 2;
-
-        let extraRepeats =
-            Math.ceil(minTotalWidth / portfolioPatternWidth) - 1;
-
-        /* Batasi jumlah pengulangan supaya DOM tidak membengkak. */
-        extraRepeats = Math.max(0, Math.min(extraRepeats, 24));
-
-        for (let r = 0; r < extraRepeats; r++) {
-            appendPortfolioCloneSet(visibleOriginals);
-        }
-    }
-
-    /*
-     * Loop animasi utama. Dipanggil terus oleh requestAnimationFrame
-     * selama carousel aktif berjalan.
-     */
-    function portfolioAutoTick(now) {
-        if (portfolioLastFrameTime === null) {
-            portfolioLastFrameTime = now;
-        }
-
-        const deltaSeconds = (now - portfolioLastFrameTime) / 1000;
-        portfolioLastFrameTime = now;
-
-        /*
-         * Jangan gerakkan otomatis kalau sedang ada animasi tombol
-         * Next/Prev yang berjalan, supaya keduanya tidak "rebutan"
-         * posisi track.
-         */
-        if (!portfolioIsAnimatingStep && portfolioPatternWidth > 0) {
-            portfolioTranslateX -=
-                PORTFOLIO_SPEED_PX_PER_SEC * deltaSeconds;
-
-            /*
-             * Titik kunci "seamless loop": begitu sudah bergeser
-             * sejauh satu pola penuh, tambahkan kembali sebesar satu
-             * pola. Karena klon di titik itu identik dengan kartu
-             * asli di posisi awal, pengguna tidak akan melihat
-             * lompatan ini sama sekali.
-             */
-            if (portfolioTranslateX <= -portfolioPatternWidth) {
-                portfolioTranslateX += portfolioPatternWidth;
-            }
-
-            applyPortfolioTransform();
-        }
-
-        portfolioRafId = requestAnimationFrame(portfolioAutoTick);
-    }
-
-    function startPortfolioAutoSlide() {
-        if (portfolioRafId !== null) {
-            return;
-        }
-
-        if (portfolioPatternWidth <= 0 || portfolioReducedMotion) {
-            return;
-        }
-
-        portfolioLastFrameTime = null;
-        portfolioRafId = requestAnimationFrame(portfolioAutoTick);
-    }
-
-    function stopPortfolioAutoSlide() {
-        if (portfolioRafId !== null) {
-            cancelAnimationFrame(portfolioRafId);
-            portfolioRafId = null;
-        }
-    }
-
-    function pausePortfolioAndResume() {
-        stopPortfolioAutoSlide();
-
-        if (portfolioResumeTimer) {
-            clearTimeout(portfolioResumeTimer);
-        }
-
-        /*
-         * Setelah user selesai berinteraksi, tunggu 3 detik
-         * sebelum marquee jalan otomatis lagi.
-         */
-        portfolioResumeTimer = setTimeout(function () {
-            startPortfolioAutoSlide();
-        }, 3000);
-    }
-
-    /*
-     * Geser track sejauh satu kartu, dipakai oleh tombol Next/Prev.
-     * direction: 1 = maju (Next), -1 = mundur (Prev).
-     * Animasinya halus (eased), lalu di akhir animasi posisinya
-     * dirapikan (dibungkus) supaya tetap berada dalam rentang satu
-     * pola, sehingga marquee otomatis bisa lanjut tanpa ada celah.
-     */
-    function stepPortfolioTrack(direction) {
-        if (portfolioPatternWidth <= 0 || portfolioIsAnimatingStep) {
-            return;
-        }
-
-        portfolioIsAnimatingStep = true;
-
-        const startX = portfolioTranslateX;
-        const targetX = startX + (-direction * portfolioItemStep);
-        const startTime = performance.now();
-
-        function tick(now) {
-            const elapsed = now - startTime;
-            const progress = Math.min(elapsed / PORTFOLIO_STEP_DURATION, 1);
-
-            /* easeInOutQuad, biar gerakan halus di awal & akhir. */
-            const eased = progress < 0.5
-                ? 2 * progress * progress
-                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-            portfolioTranslateX = startX + (targetX - startX) * eased;
+        if (total === 0) {
             applyPortfolioTransform();
 
-            if (progress < 1) {
-                requestAnimationFrame(tick);
-                return;
-            }
-
-            /*
-             * Animasi selesai. Bungkus (wrap) posisi supaya tetap
-             * berada di rentang (-portfolioPatternWidth, 0], persis
-             * seperti yang dilakukan marquee otomatis. Karena
-             * bungkusannya persis satu pola, tidak ada lompatan yang
-             * terlihat.
-             */
-            while (portfolioTranslateX <= -portfolioPatternWidth) {
-                portfolioTranslateX += portfolioPatternWidth;
-            }
-
-            while (portfolioTranslateX > 0) {
-                portfolioTranslateX -= portfolioPatternWidth;
-            }
-
-            applyPortfolioTransform();
-            portfolioIsAnimatingStep = false;
-        }
-
-        requestAnimationFrame(tick);
-    }
-
-    function nextPortfolio() {
-        stepPortfolioTrack(1);
-    }
-
-    function prevPortfolio() {
-        stepPortfolioTrack(-1);
-    }
-
-    /*
-     * Membangun ulang carousel dari nol: dipakai saat pertama kali
-     * halaman dibuka, saat filter kategori berganti, dan saat ukuran
-     * layar berubah (resize).
-     */
-    function rebuildPortfolioCarousel() {
-        stopPortfolioAutoSlide();
-
-        portfolioTranslateX = 0;
-        applyPortfolioTransform();
-
-        buildPortfolioClones();
-
-        const visibleOriginals = getVisiblePortfolioItems();
-
-        if (visibleOriginals.length === 0) {
-            /* Tidak ada kartu untuk kategori ini: sembunyikan tombol. */
             if (portfolioPrev) {
                 portfolioPrev.classList.add('hidden');
             }
@@ -6860,36 +5482,150 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
             return;
         }
 
-        /*
-         * Ini carousel tanpa akhir (infinite), jadi tombol Next/Prev
-         * selalu aktif selama ada minimal satu kartu untuk ditampilkan.
-         */
         if (portfolioPrev) {
             portfolioPrev.classList.remove('hidden');
-            portfolioPrev.classList.remove('disabled');
         }
 
         if (portfolioNext) {
             portfolioNext.classList.remove('hidden');
-            portfolioNext.classList.remove('disabled');
         }
 
-        startPortfolioAutoSlide();
+        /* Urutkan kartu asli sesuai urutan tampil saat ini. */
+        originals.forEach(function (item) {
+            portfolioGrid.appendChild(item);
+        });
+
+        /* Ukur lebar satu kartu + gap untuk menghitung minimal pengulangan. */
+        const firstRect = originals[0].getBoundingClientRect();
+        const gapValue = parseFloat(
+            getComputedStyle(portfolioGrid).columnGap ||
+            getComputedStyle(portfolioGrid).gap ||
+            '0'
+        ) || 0;
+
+        portfolioItemFootprint = firstRect.width + gapValue;
+
+        const viewportWidth = portfolioViewport.clientWidth || window.innerWidth;
+        const minHalfWidth = Math.max(1300, viewportWidth * 1.4);
+
+        const repeat = Math.max(
+            1,
+            Math.ceil(minHalfWidth / Math.max(total * portfolioItemFootprint, 1))
+        );
+
+        /* Tambahan salinan (selain kartu asli) untuk melengkapi putaran pertama. */
+        for (let r = 1; r < repeat; r++) {
+            originals.forEach(function (item) {
+                portfolioGrid.appendChild(makePortfolioClone(item));
+            });
+        }
+
+        /* Duplikasi seluruh putaran pertama menjadi putaran kedua yang identik. */
+        const firstHalfNodes = Array.from(
+            portfolioGrid.querySelectorAll('.portfolio-item')
+        );
+
+        firstHalfNodes.forEach(function (node) {
+            portfolioGrid.appendChild(makePortfolioClone(node));
+        });
+
+        /* Lebar satu putaran penuh, diukur langsung dari track. */
+        portfolioHalfWidthPx = portfolioGrid.scrollWidth / 2;
+
+        /* Kecepatan: sedikit lebih lambat daripada Klien & Mitra. */
+        const halfCount = total * repeat;
+
+        const duration = Math.max(
+            halfCount * PORTFOLIO_MARQUEE_SECONDS_PER_ITEM,
+            PORTFOLIO_MARQUEE_MIN_SECONDS
+        );
+
+        portfolioSpeedPxPerSec = portfolioHalfWidthPx / duration;
+
+        applyPortfolioTransform();
+    }
+
+    /*
+     * Loop animasi utama: geser posisi terus-menerus setiap frame,
+     * dan bungkus kembali ke 0 begitu satu putaran penuh selesai —
+     * tidak pernah berhenti di antaranya.
+     */
+    function portfolioTick(timestamp) {
+
+        if (portfolioLastTimestamp === null) {
+            portfolioLastTimestamp = timestamp;
+        }
+
+        const deltaSeconds = (timestamp - portfolioLastTimestamp) / 1000;
+        portfolioLastTimestamp = timestamp;
+
+        if (
+            !portfolioPaused &&
+            portfolioHalfWidthPx > 0
+        ) {
+
+            portfolioOffsetPx -= portfolioSpeedPxPerSec * deltaSeconds;
+
+            if (portfolioOffsetPx <= -portfolioHalfWidthPx) {
+                portfolioOffsetPx += portfolioHalfWidthPx;
+            }
+
+            applyPortfolioTransform();
+        }
+
+        portfolioRafId = window.requestAnimationFrame(portfolioTick);
+    }
+
+    /*
+     * Geser manual satu kartu lewat tombol panah. Animasi otomatis
+     * tetap lanjut setelah jeda singkat.
+     */
+    function nudgePortfolio(direction) {
+
+        if (portfolioHalfWidthPx <= 0 || portfolioItemFootprint <= 0) {
+            return;
+        }
+
+        portfolioOffsetPx -= direction * portfolioItemFootprint;
+
+        if (portfolioOffsetPx <= -portfolioHalfWidthPx) {
+            portfolioOffsetPx += portfolioHalfWidthPx;
+        } else if (portfolioOffsetPx > 0) {
+            portfolioOffsetPx -= portfolioHalfWidthPx;
+        }
+
+        portfolioGrid.style.transition =
+            'transform ' + PORTFOLIO_NUDGE_MS + 'ms ease';
+
+        applyPortfolioTransform();
+
+        window.setTimeout(function () {
+            portfolioGrid.style.transition = 'none';
+        }, PORTFOLIO_NUDGE_MS + 30);
+
+        portfolioPaused = true;
+
+        if (portfolioResumeTimer) {
+            clearTimeout(portfolioResumeTimer);
+        }
+
+        portfolioResumeTimer = window.setTimeout(function () {
+            portfolioPaused = false;
+        }, PORTFOLIO_RESUME_MS);
     }
 
     if (portfolioGrid && portfolioViewport) {
+      try {
 
         if (portfolioPrev) {
             portfolioPrev.addEventListener('click', function () {
-                pausePortfolioAndResume();
-                prevPortfolio();
+                nudgePortfolio(-1);
             });
         }
 
         if (portfolioNext) {
             portfolioNext.addEventListener('click', function () {
-                pausePortfolioAndResume();
-                nextPortfolio();
+                nudgePortfolio(1);
             });
         }
 
@@ -6944,24 +5680,21 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
                 });
 
                 /*
-                 * Kategori berganti -> bangun ulang track (kloningan
-                 * lama dibuang, dibuat ulang dari kartu yang sekarang
-                 * terlihat), lalu marquee lanjut berjalan seamless.
+                 * Kategori berganti -> bangun ulang marquee dari kartu
+                 * yang sekarang terlihat.
                  */
-                rebuildPortfolioCarousel();
-
-                pausePortfolioAndResume();
+                rebuildPortfolioMarquee();
 
             });
 
         });
 
         /*
-         * Pause ketika mouse berada di area portfolio.
-         * Saat mouse keluar, marquee berjalan lagi.
+         * Pause saat mouse berada di area portfolio, lanjut lagi
+         * saat mouse keluar (sama seperti marquee Klien & Mitra).
          */
         portfolioViewport.addEventListener('mouseenter', function () {
-            stopPortfolioAutoSlide();
+            portfolioPaused = true;
 
             if (portfolioResumeTimer) {
                 clearTimeout(portfolioResumeTimer);
@@ -6969,86 +5702,8 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
         });
 
         portfolioViewport.addEventListener('mouseleave', function () {
-            startPortfolioAutoSlide();
+            portfolioPaused = false;
         });
-
-        /*
-         * Touch / swipe untuk HP.
-         */
-        portfolioViewport.addEventListener(
-            'touchstart',
-            function (event) {
-
-                if (!event.touches || !event.touches[0]) {
-                    return;
-                }
-
-                portfolioIsPointerDown = true;
-                portfolioTouchStartX =
-                    event.touches[0].clientX;
-
-                portfolioTouchStartY =
-                    event.touches[0].clientY;
-
-                stopPortfolioAutoSlide();
-
-                if (portfolioResumeTimer) {
-                    clearTimeout(portfolioResumeTimer);
-                }
-
-            },
-            { passive: true }
-        );
-
-        portfolioViewport.addEventListener(
-            'touchend',
-            function (event) {
-
-                if (!portfolioIsPointerDown) {
-                    return;
-                }
-
-                portfolioIsPointerDown = false;
-
-                if (!event.changedTouches || !event.changedTouches[0]) {
-                    startPortfolioAutoSlide();
-                    return;
-                }
-
-                const touchEndX =
-                    event.changedTouches[0].clientX;
-
-                const touchEndY =
-                    event.changedTouches[0].clientY;
-
-                const diffX =
-                    touchEndX - portfolioTouchStartX;
-
-                const diffY =
-                    touchEndY - portfolioTouchStartY;
-
-                /*
-                 * Hanya anggap sebagai swipe jika gerakan
-                 * horizontal lebih besar daripada vertikal.
-                 */
-                if (
-                    Math.abs(diffX) > 50 &&
-                    Math.abs(diffX) > Math.abs(diffY)
-                ) {
-
-                    if (diffX < 0) {
-                        nextPortfolio();
-                    } else {
-                        prevPortfolio();
-                    }
-
-                }
-
-                pausePortfolioAndResume();
-
-            },
-            { passive: true }
-        );
 
         /*
          * Kartu hasil kloning tidak punya event listener modal
@@ -7077,9 +5732,8 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
         });
 
         /*
-         * Resize browser: ukuran kartu berubah (3/2/1 kolom), jadi
-         * track perlu dibangun ulang supaya pola & kecepatannya
-         * tetap presisi.
+         * Resize browser: lebar kartu berubah (breakpoint), jadi
+         * jumlah pengulangan & kecepatan perlu dihitung ulang.
          */
         let portfolioResizeTimer = null;
 
@@ -7088,16 +5742,25 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
             clearTimeout(portfolioResizeTimer);
 
             portfolioResizeTimer = setTimeout(function () {
-                rebuildPortfolioCarousel();
-            }, 120);
+                rebuildPortfolioMarquee();
+            }, 150);
 
         });
 
         /*
-         * Inisialisasi pertama.
+         * Inisialisasi pertama, lalu mulai loop animasi.
          */
-        rebuildPortfolioCarousel();
+        rebuildPortfolioMarquee();
+        portfolioRafId = window.requestAnimationFrame(portfolioTick);
 
+      } catch (portfolioMarqueeError) {
+        /*
+         * Kalau ada error saat setup, tampilkan di console (F12)
+         * supaya kelihatan penyebabnya, tapi jangan sampai
+         * menghentikan script lain di halaman ini.
+         */
+        console.error('Portfolio marquee gagal jalan:', portfolioMarqueeError);
+      }
     }
 
     /* =========================================================
@@ -7760,9 +6423,137 @@ if (growDividers.length > 0 && 'IntersectionObserver' in window) {
 
             });
 
+
+            const pushPath =
+                sectionToPath[targetId.replace('#', '')];
+
+            if (pushPath && window.location.pathname !== pushPath) {
+
+                isProgrammaticScroll = true;
+
+                history.pushState(null, '', pushPath);
+
+                clearTimeout(programmaticScrollTimer);
+
+                programmaticScrollTimer = setTimeout(function () {
+                    isProgrammaticScroll = false;
+                }, 1000);
+
+            }
+
         });
 
     });
+
+
+    /* =========================================================
+       SECTION <-> URL MAPPING
+
+       Tiap section utama punya path sendiri (didaftarkan di
+       routes/web.php). Dua arah:
+       1. Buka path langsung (mis. /tentang-kami) -> auto scroll
+          ke section yang sesuai saat halaman selesai load.
+       2. User scroll manual / klik nav -> address bar ikut
+          berubah ke path section yang sedang aktif, tanpa reload
+          halaman (history.pushState / replaceState).
+    ========================================================== */
+
+    const sectionToPath = {
+        beranda: '/',
+        tentang: '/tentang-kami',
+        layanan: '/layanan',
+        portofolio: '/portofolio',
+        testimoni: '/testimoni',
+        kontak: '/kontak'
+    };
+
+    const pathToSection = Object.fromEntries(
+        Object.entries(sectionToPath).map(([id, path]) => [path, id])
+    );
+
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimer = null;
+
+    // 1) Auto-scroll ke section yang sesuai kalau halaman dibuka
+    //    lewat path selain "/", mis. /testimoni
+    (function () {
+        const targetSection = pathToSection[window.location.pathname];
+
+        if (!targetSection || targetSection === 'beranda') {
+            return;
+        }
+
+        const target = document.getElementById(targetSection);
+
+        if (!target) {
+            return;
+        }
+
+        isProgrammaticScroll = true;
+
+        window.addEventListener('load', function () {
+
+            const headerHeight =
+                siteHeader ? siteHeader.offsetHeight : 0;
+
+            const targetPosition =
+                target.getBoundingClientRect().top +
+                window.scrollY -
+                headerHeight -
+                10;
+
+            window.scrollTo({ top: targetPosition, behavior: 'instant' });
+
+            setTimeout(function () {
+                isProgrammaticScroll = false;
+            }, 500);
+
+        });
+    })();
+
+    // 2) Update address bar otomatis saat user scroll manual
+    //    melewati section (tanpa reload / tanpa masuk history baru
+    //    — pakai replaceState supaya tombol Back browser tidak
+    //    kepenuhan tiap ganti section).
+    (function () {
+        const observedSections = Object.keys(sectionToPath)
+            .map(function (id) { return document.getElementById(id); })
+            .filter(Boolean);
+
+        if (!observedSections.length || !('IntersectionObserver' in window)) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(function (entries) {
+
+            if (isProgrammaticScroll) {
+                return;
+            }
+
+            entries.forEach(function (entry) {
+
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+                const path = sectionToPath[entry.target.id];
+
+                if (path && window.location.pathname !== path) {
+                    history.replaceState(null, '', path);
+                }
+
+            });
+
+        }, {
+            root: null,
+            rootMargin: '-45% 0px -45% 0px',
+            threshold: 0
+        });
+
+        observedSections.forEach(function (section) {
+            observer.observe(section);
+        });
+    })();
 
 
     /* =========================================================

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
 use Illuminate\Database\Eloquent\Model;
 
 class ClientPartner extends Model
 {
+    use TracksAdminAuthorship;
+
     protected $fillable = [
         'name',
         'logo',
@@ -14,6 +17,7 @@ class ClientPartner extends Model
         'website',
         'sort_order',
         'is_published',
+        'updated_by',
     ];
 
     protected function casts(): array

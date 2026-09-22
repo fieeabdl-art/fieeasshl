@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingRequest;
+use App\Models\HeroSlide;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -15,24 +17,41 @@ class SettingController extends Controller
     {
         $setting = Setting::current();
 
-        return view('admin.settings.edit', compact('setting'));
+        $heroSlides = HeroSlide::query()
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('admin.settings.edit', compact('setting', 'heroSlides'));
     }
 
     public function update(UpdateSettingRequest $request): RedirectResponse
     {
         $setting = Setting::current();
+
         $data = $request->safe()->except([
             'logo',
+            'favicon',
             'remove_logo',
+            'remove_favicon',
             'hero_image',
             'about_image',
             'remove_hero_image',
             'remove_about_image',
+            'about_video',
+            'remove_about_video',
+            'parent_company_logo',
+            'remove_parent_company_logo',
             'social_instagram',
             'social_facebook',
             'social_tiktok',
             'social_youtube',
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Social Media
+        |--------------------------------------------------------------------------
+        */
 
         $social = array_filter([
             'instagram' => $request->input('social_instagram'),
@@ -43,8 +62,23 @@ class SettingController extends Controller
 
         $data['social_links'] = $social ?: null;
 
+        /*
+        |--------------------------------------------------------------------------
+        | Admin
+        |--------------------------------------------------------------------------
+        */
+
+        $data['updated_by'] = Auth::guard('admin')->id();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Logo
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->boolean('remove_logo') && $setting->logo) {
             Storage::disk('public')->delete($setting->logo);
+
             $data['logo'] = null;
         }
 
@@ -52,11 +86,43 @@ class SettingController extends Controller
             if ($setting->logo) {
                 Storage::disk('public')->delete($setting->logo);
             }
-            $data['logo'] = $request->file('logo')->store('settings', 'public');
+
+            $data['logo'] = $request
+                ->file('logo')
+                ->store('settings', 'public');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Favicon
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->boolean('remove_favicon') && $setting->favicon) {
+            Storage::disk('public')->delete($setting->favicon);
+
+            $data['favicon'] = null;
+        }
+
+        if ($request->hasFile('favicon')) {
+            if ($setting->favicon) {
+                Storage::disk('public')->delete($setting->favicon);
+            }
+
+            $data['favicon'] = $request
+                ->file('favicon')
+                ->store('settings', 'public');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hero Image
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->boolean('remove_hero_image') && $setting->hero_image) {
             Storage::disk('public')->delete($setting->hero_image);
+
             $data['hero_image'] = null;
         }
 
@@ -64,11 +130,21 @@ class SettingController extends Controller
             if ($setting->hero_image) {
                 Storage::disk('public')->delete($setting->hero_image);
             }
-            $data['hero_image'] = $request->file('hero_image')->store('settings', 'public');
+
+            $data['hero_image'] = $request
+                ->file('hero_image')
+                ->store('settings', 'public');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | About Image
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->boolean('remove_about_image') && $setting->about_image) {
             Storage::disk('public')->delete($setting->about_image);
+
             $data['about_image'] = null;
         }
 
@@ -76,8 +152,61 @@ class SettingController extends Controller
             if ($setting->about_image) {
                 Storage::disk('public')->delete($setting->about_image);
             }
-            $data['about_image'] = $request->file('about_image')->store('settings', 'public');
+
+            $data['about_image'] = $request
+                ->file('about_image')
+                ->store('settings', 'public');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | About Video
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->boolean('remove_about_video') && $setting->about_video) {
+            Storage::disk('public')->delete($setting->about_video);
+
+            $data['about_video'] = null;
+        }
+
+        if ($request->hasFile('about_video')) {
+            if ($setting->about_video) {
+                Storage::disk('public')->delete($setting->about_video);
+            }
+
+            $data['about_video'] = $request
+                ->file('about_video')
+                ->store('settings/videos', 'public');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Parent Company Logo (Corporate Ecosystem)
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->boolean('remove_parent_company_logo') && $setting->parent_company_logo) {
+            Storage::disk('public')->delete($setting->parent_company_logo);
+
+            $data['parent_company_logo'] = null;
+        }
+
+        if ($request->hasFile('parent_company_logo')) {
+            if ($setting->parent_company_logo) {
+                Storage::disk('public')->delete($setting->parent_company_logo);
+            }
+
+            $data['parent_company_logo'] = $request
+                ->file('parent_company_logo')
+                ->store('settings', 'public');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save
+        |--------------------------------------------------------------------------
+        */
 
         $setting->update($data);
 

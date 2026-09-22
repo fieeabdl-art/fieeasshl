@@ -1,14 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\ClientPartnerController;
 use App\Http\Controllers\Admin\AffiliatedDivisionController;
+use App\Http\Controllers\Admin\ClientPartnerController;
 use App\Http\Controllers\Admin\WorkflowController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureTeamMembership;
-use App\Models\ClientPartner;
 use App\Models\AffiliatedDivision;
+use App\Models\ClientPartner;
+use App\Models\Faq;
+use App\Models\HeroSlide;
 use App\Models\Portfolio;
 use App\Models\Service;
 use App\Models\Setting;
@@ -17,6 +19,7 @@ use App\Models\Testimonial;
 use App\Models\Workflow;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,8 +58,13 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
+$landingPage = function () {
     $setting = Setting::current();
+
+    $heroSlides = HeroSlide::query()
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->get();
 
     $social = $setting->social_links ?? [];
 
@@ -110,6 +118,17 @@ Route::get('/', function () {
         'visi' => $setting->about_vision,
 
         'misi' => $setting->about_mission,
+
+        'parent_company_name' => $setting->parent_company_name ?: 'PT Arada Integra Indonesia',
+
+        'parent_company_brand' => $setting->parent_company_brand ?: 'Artersia',
+
+        'ecosystem_intro' => $setting->ecosystem_intro
+            ?: 'Satu ekosistem, beragam keahlian, terhubung dalam sinergi yang berkelanjutan.',
+
+        'parent_company_logo_url' => $setting->parent_company_logo
+            ? Storage::url($setting->parent_company_logo)
+            : null,
     ];
 
     /*
@@ -184,6 +203,18 @@ Route::get('/', function () {
 
     /*
     |--------------------------------------------------------------------------
+    | FAQ
+    |--------------------------------------------------------------------------
+    */
+
+    $faqs = Faq::query()
+        ->where('is_published', true)
+        ->orderBy('sort_order')
+        ->orderByDesc('created_at')
+        ->get();
+
+    /*
+    |--------------------------------------------------------------------------
     | Landing Page
     |--------------------------------------------------------------------------
     */
@@ -227,19 +258,143 @@ Route::get('/', function () {
             'desc' => $d->description,
         ]);
 
+    /*
+    |--------------------------------------------------------------------------
+    | SEO — meta per section
+    |--------------------------------------------------------------------------
+    | Semua route section (lihat bawah) render view yang SAMA PERSIS, jadi
+    | supaya tidak dianggap duplicate content oleh Google, seluruhnya
+    | canonical ke "/". Title & description tetap dibuat beda per section
+    | untuk konteks share link (WhatsApp/Facebook) dan relevansi on-page.
+    */
+
+    $siteName = $settings['site_title'];
+
+    $seoSections = [
+        'home' => [
+            'title' => $siteName.' — Interior, Arsitektur & Kontraktor Sukabumi',
+            'description' => $setting->hero_subtitle
+                ?: 'Jasa desain interior, arsitektur, dan kontraktor terpercaya di Sukabumi, Jawa Barat.',
+            'path' => '/',
+        ],
+        'home.tentang' => [
+            'title' => 'Tentang Kami — '.$siteName,
+            'description' => $setting->about_description
+                ? Str::limit(strip_tags($setting->about_description), 155)
+                : 'Kenali lebih dekat '.$siteName.', perusahaan interior, arsitektur, dan kontraktor di Sukabumi.',
+            'path' => '/tentang-kami',
+        ],
+        'home.layanan' => [
+            'title' => 'Layanan — '.$siteName,
+            'description' => 'Layanan desain interior, arsitektur, dan kontraktor dari '.$siteName.' untuk hunian dan komersial Anda.',
+            'path' => '/layanan',
+        ],
+        'home.portofolio' => [
+            'title' => 'Portofolio Proyek — '.$siteName,
+            'description' => 'Lihat portofolio proyek interior, arsitektur, dan konstruksi yang telah dikerjakan '.$siteName.'.',
+            'path' => '/portofolio',
+        ],
+        'home.testimoni' => [
+            'title' => 'Testimoni Klien — '.$siteName,
+            'description' => 'Testimoni dan ulasan klien yang puas dengan layanan '.$siteName.'.',
+            'path' => '/testimoni',
+        ],
+        'home.kontak' => [
+            'title' => 'Kontak & Konsultasi — '.$siteName,
+            'description' => 'Hubungi '.$siteName.' untuk konsultasi gratis proyek interior, arsitektur, dan kontraktor Anda.',
+            'path' => '/kontak',
+        ],
+    ];
+
+    $currentRouteName = Route::currentRouteName() ?? 'home';
+
+    $seo = $seoSections[$currentRouteName] ?? $seoSections['home'];
+    $seo['canonical'] = url('/');
+    $seo['og_image'] = $settings['logo_url'] ?: asset('images/og-default.jpg');
+
+    /*
+    |--------------------------------------------------------------------------
+    | JSON-LD — LocalBusiness structured data
+    |--------------------------------------------------------------------------
+    */
+
+    $sameAs = array_values(array_filter([
+        $settings['instagram'] ?? null,
+        $settings['facebook'] ?? null,
+        $settings['tiktok'] ?? null,
+        $settings['youtube'] ?? null,
+    ]));
+
+    $jsonLd = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'HomeAndConstructionBusiness',
+        'name' => $siteName,
+        'image' => $seo['og_image'],
+        'url' => url('/'),
+        'telephone' => $settings['wa_number'] ?? null,
+        'email' => $settings['email'] ?? null,
+        'address' => array_filter([
+            '@type' => 'PostalAddress',
+            'streetAddress' => $settings['address'] ?? null,
+            'addressLocality' => 'Sukabumi',
+            'addressRegion' => 'Jawa Barat',
+            'addressCountry' => 'ID',
+        ]),
+        'hasMap' => $settings['maps_url'] ?? null,
+        'sameAs' => $sameAs ?: null,
+    ]);
+
     return view('index', compact(
         'settings',
         'misiList',
         'portfolios',
         'testimonials',
+        'faqs',
         'setting',
+        'heroSlides',
         'team',
         'workflows',
         'clientPartners',
         'services',
-        'affiliatedDivisions'
+        'affiliatedDivisions',
+        'seo',
+        'jsonLd'
     ));
-})->name('home');
+};
+
+/*
+|--------------------------------------------------------------------------
+| Landing Page — route per section
+|--------------------------------------------------------------------------
+| Semua route di bawah ini pakai closure ($landingPage) yang sama persis
+| (data yang di-load tidak berubah), cuma path/URL-nya beda per section.
+| Section mana yang di-scroll ke saat halaman dibuka ditentukan di JS
+| lewat window.location.pathname (lihat index.blade.php).
+*/
+
+Route::get('/', $landingPage)->name('home');
+Route::get('/tentang-kami', $landingPage)->name('home.tentang');
+Route::get('/layanan', $landingPage)->name('home.layanan');
+Route::get('/portofolio', $landingPage)->name('home.portofolio');
+Route::get('/testimoni', $landingPage)->name('home.testimoni');
+Route::get('/kontak', $landingPage)->name('home.kontak');
+
+/*
+|--------------------------------------------------------------------------
+| sitemap.xml — dinamis, otomatis pakai APP_URL
+|--------------------------------------------------------------------------
+| Cuma daftar "/" karena semua route section canonical ke situ (lihat
+| $seo['canonical'] di atas) — mencegah Google index 6 URL yang isinya
+| sama sebagai halaman terpisah.
+*/
+
+Route::get('/sitemap.xml', function () {
+    $xml = view('sitemap', ['urls' => [
+        ['loc' => url('/'), 'priority' => '1.0'],
+    ]])->render();
+
+    return response($xml, 200)->header('Content-Type', 'application/xml');
+})->name('sitemap');
 
 /*
 |--------------------------------------------------------------------------

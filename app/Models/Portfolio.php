@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\TracksAdminAuthorship;
 use App\Enums\PortfolioCategory;
 use Database\Factories\PortfolioFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -29,11 +30,14 @@ use Illuminate\Support\Carbon;
     'image',
     'sort_order',
     'is_published',
+    'updated_by',
 ])]
 class Portfolio extends Model
 {
     /** @use HasFactory<PortfolioFactory> */
     use HasFactory;
+
+    use TracksAdminAuthorship;
 
     /**
      * Get the attributes that should be cast.
@@ -48,8 +52,9 @@ class Portfolio extends Model
             'sort_order' => 'integer',
         ];
     }
+
     public function phases()
-{
-    return $this->hasMany(PortfolioPhase::class)->orderBy('sort_order');
-}
+    {
+        return $this->hasMany(PortfolioPhase::class)->orderBy('sort_order');
+    }
 }
